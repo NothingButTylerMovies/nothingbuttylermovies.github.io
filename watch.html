@@ -1,604 +1,1139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>S1E1: The Visitor | Jenna and Tubers | NothingButTyler Movies</title>
-    <script src="https://kit.fontawesome.com/eeb01edac2.js" crossorigin="anonymous"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-
-     <style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Watch {Episode_Name} | NothingButTyler Movies</title>
+  <script src="https://kit.fontawesome.com/eeb01edac2.js" crossorigin="anonymous"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
     :root {
-        --ice-blue: #38bdf8;
-        --onyx-black: #05070a;
-        --text-main: #f9f9f9;
+      --ice-blue: #38bdf8;
+      --accent-main: var(--ice-blue);
+      --accent-glow: rgba(56,189,248,0.6);
     }
+    body.theme-red { --accent-main: #ff4d4d; --accent-glow: rgba(255,77,77,0.6); }
+    body.theme-green { --accent-main: #00ff88; --accent-glow: rgba(0,255,136,0.6); }
 
-    body {
-        margin: 0; font-family: 'Inter', sans-serif;
-        background: var(--onyx-black); color: var(--text-main);
-        display: flex; flex-direction: column; align-items: center;
-        min-height: 100vh; overflow: hidden;
-    }
+    body { margin:0; font-family:'Inter', sans-serif; background:#000; color:#fff; display:flex; flex-direction:column; align-items:center; min-height:100vh; overflow:hidden; }
+    html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; }
 
-    /* PLAYER CONTAINER */
-    .player-container {
-        width: 95%; max-width: 1200px; aspect-ratio: 16/9;
-        background: #000; border-radius: 12px; overflow: hidden;
-        box-shadow: 0 0 40px rgba(0,0,0,1);
-        position: relative; margin-top: 10px;
-    }
-
-    video { width: 100%; height: 100%; object-fit: contain; }
+    video { width:100%; height:100%; object-fit:contain; position:absolute; top:0; left:0; }
 
     /* AD OVERLAY */
-    #ad-overlay {
-        display: none; 
-        position: absolute; top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: black; z-index: 2000;
-        justify-content: center; align-items: center;
-        pointer-events: auto; /* Ensure clicks work */
+    #ad-overlay { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:black; z-index:2000; justify-content:center; align-items:center; pointer-events:auto; }
+    #ad-content { position:relative; width:100%; height:100%; display:flex; justify-content:center; align-items:center; }
+
+    #ad-video { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: contain; 
+      background: black; 
+      position: absolute; 
+      top: 0;             
+      left: 0;            
+      z-index: 10;        
     }
 
-    #bumper-layer {
-        position: absolute; top: 0; left: 0;
-        width: 100%; height: 100%;
-        display: flex; justify-content: center; align-items: center;
-        z-index: 2100; pointer-events: none;
-    }
+    #ad-timer-container { position:absolute; bottom:30px; right:30px; width:65px; height:65px; background:#2a2a2a; border-radius:50%; display:flex; justify-content:center; align-items:center; z-index:5000; border:3px solid #1a1a1a; }
+    .timer-svg { width:100%; height:100%; transform:rotate(-90deg); }
+    .timer-bg { fill: rgba(0,0,0,0.4); stroke: rgba(255,255,255,0.1); stroke-width:8; }
+    #timer-progress { fill:none; stroke:var(--accent-main); stroke-width:8; stroke-dasharray:220; stroke-dashoffset:220; transition:stroke-dashoffset 0.1s linear; }
+    #ad-timer { position:absolute; font-size:1.4rem; font-weight:900; color:white; }
 
-    #ad-message {
-        position: absolute; top: 50%; left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 2.5rem; font-weight: 900;
-        text-align: center; color: var(--ice-blue);
-        text-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
-        text-transform: uppercase; opacity: 0;
-        z-index: 2200; pointer-events: none;
-        transition: opacity 0.8s ease;
+    #ad-play-container {
+      position: absolute;
+      bottom: 30px;
+      left: 30px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--accent-main);
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      z-index: 9000;
     }
+    #ad-play-container i { font-size: 1.6rem; }
+    #ad-play-container:hover { transform: scale(1.05); }
 
-    .pulse-text { animation: pulse 2s infinite; }
-    @keyframes pulse {
-        0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        50% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.05); }
+    /* CONTROLS */
+    .player-container { width:100vw; height:100svh; position:relative; overflow:hidden; background:#000; }
+    .video-controls, .video-overlay-top { position:absolute; width:100%; box-sizing:border-box; display:flex; flex-direction:column; gap:10px; opacity:0; pointer-events:none; transition:opacity 0.25s ease; z-index:5000; }
+    .video-controls.active, .video-overlay-top.active { opacity:1; pointer-events:auto; }
+
+    .video-overlay-top { top:0; flex-direction:row; justify-content:/*flex-start*/ space-between; gap:20px; padding:10px; align-items: center; }
+    .back-btn { color:white; text-decoration:none; font-size:1.5rem; width:45px; height:45px; display:flex; justify-content:center; align-items:center; border-radius:50%; background:rgba(255,255,255,0.1); transition:0.3s; }
+    .back-btn:hover { background:var(--accent-main); }
+
+    .episode-details { margin-left:20px; }
+    #mini-show-title { color:var(--accent-main); font-weight:900; text-transform:uppercase; font-size:0.75rem; letter-spacing:2px; }
+    #large-episode-title { font-size:1.2rem; margin:0; text-shadow:2px 2px 4px rgba(0,0,0,0.8); }
+
+    .control-buttons { display:flex; justify-content:/*space-between*/ flex-start; align-items:center; width:100%; gap:14px; }
+    .right-group { margin-left: auto; display:flex; gap:14px; flex-shrink:0; }
+    .control-buttons button { background:none; border:none; color:var(--accent-main); font-size:1.8rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform 0.2s ease, filter 0.3s ease; }
+    .control-buttons button:hover { transform:scale(1.1); filter:drop-shadow(0 0 10px var(--accent-main)); }
+    #time-display { font-size:1rem; font-weight:700; color:white; margin-left:10px; }
+
+    .progress-area {
+  width: 100%;
+  height: 6px;
+  display: flex;
+  align-items: center;
+      margin-bottom: 2px;
+}  
+  .progress-filled { height:100%; width:0%; background:var(--accent-main); border-radius:10px; }
+
+    /* SETTINGS MENU */
+    #settings-menu { 
+      display: none; 
+      position: fixed; 
+      top: 50%; 
+      left: 50%; 
+      transform: translate(-50%,-50%); 
+      width: 90%;
+      max-width: 400px;
+      background: rgba(5,7,10,0.95); 
+      padding: 50px 20px 25px; 
+      border-radius: 20px; 
+      border: 2px solid var(--accent-main); 
+      z-index: 10000; 
+      flex-direction: column;
+      align-items: center;
     }
-
-    #ad-video {
-        width: 100%; height: 100%; object-fit: contain;
-        opacity: 1; transition: opacity 1s ease;
-    }
-
-    /* CONTROLS & UI */
-    .video-controls {
-        position: absolute; bottom: 0; left: 0; width: 100%;
-        padding: 20px;
-        background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-        display: none; flex-direction: column; gap: 10px;
-        z-index: 4000; box-sizing: border-box;
-    }
-
-    .control-buttons { display: flex; align-items: center; gap: 20px; width: 100%; }
+    #settings-menu.visible { display: flex !important; }
     
-    .control-buttons button {
-        background: none; border: none; color: var(--ice-blue);
-        font-size: 1.8rem; cursor: pointer; padding: 5px;
-        display: flex; align-items: center; justify-content: center;
-        transition: transform 0.2s ease, filter 0.3s ease;
-    }
-    .control-buttons button:hover {
-        transform: scale(1.1); filter: drop-shadow(0 0 10px var(--ice-blue));
+    #settings-close-btn { position:absolute; top:0; right:0; font-size:1.8rem; color:var(--accent-main); background:none; border:none; cursor:pointer; z-index:10001; }
+    #settings-menu button { width:90%; font-size:0.9rem; padding:10px 12px; margin-bottom:10px; color:var(--accent-main); border:2px solid var(--accent-main); border-radius:12px; background:rgba(0,0,0,0.8); font-weight:700; cursor:pointer; box-shadow:0 0 15px var(--accent-glow); }
+    #settings-menu button:hover { background:var(--accent-main); color:#000; box-shadow:0 0 25px var(--accent-glow); }
+
+    @media (max-width:768px) {
+      #settings-menu { width: 85%; max-height: 80vh; padding: 20px; }
     }
 
-    .right-group { margin-left: auto; display: flex; gap: 25px; align-items: center; }
+    /* PLAY ICON FORCE COLOR */
+    #play-icon, button i { color:var(--accent-main) !important; }
 
-    #time-display { font-size: 1rem; font-weight: 700; color: white; margin-left: 10px; }
-
-    .progress-area { width: 100%; height: 6px; background: rgba(255,255,255,0.2); border-radius: 10px; cursor: pointer; }
-    .progress-filled { height: 100%; width: 0%; background: var(--ice-blue); border-radius: 10px; box-shadow: 0 0 15px var(--ice-blue); position: relative; }
-
-    /* TOP BAR */
-    .video-overlay-top {
-        position: absolute; top: 0; left: 0; width: 100%;
-        padding: 20px 40px;
-        background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-        display: none; align-items: center; justify-content: space-between;
-        z-index: 4500; box-sizing: border-box;
-        pointer-events: auto;
-    }
-
-    .back-btn {
-        color: white; text-decoration: none; font-size: 1.5rem;
-        background: rgba(255, 255, 255, 0.1); width: 45px; height: 45px;
-        display: flex; justify-content: center; align-items: center;
-        border-radius: 50%; transition: 0.3s;
-    }
-    .back-btn:hover { background: var(--ice-blue); }
-
-    .episode-details { margin-left: 20px; }
-    #mini-show-title { color: var(--ice-blue); font-weight: 900; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; }
-    #large-episode-title { font-size: 1.2rem; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
-
-    /* 1. FIXED LOADER (CENTERS IT PROPERLY) */
-    .loader-wrapper {
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: black; 
-        display: flex; justify-content: center; align-items: center;
-        z-index: 7000;
-    }
-
-    .loader { 
-        border: 4px solid rgba(255, 255, 255, 0.1); 
-        border-top: 4px solid var(--ice-blue); 
-        border-radius: 50%; 
-        width: 50px; height: 50px; 
-        animation: spin 1s linear infinite; 
-    }
-
-    /* 2. ADD THIS TO MAKE CONTROLS SHOW UP */
-    .video-controls.active, .video-overlay-top.active {
-        display: flex !important;
-        opacity: 1;
-    }
-
-
-#ad-label {
-    position: absolute;
-    top: 30px;
-    left: 30px;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 12px;
-    letter-spacing: 3px;
-    font-weight: 900;
-    z-index: 500;
-}
-
-/* Position the blue button exactly like the image */
-#play-hint {
-    position: absolute;
-    bottom: 90px;
-    left: 30px;
-    background: var(--ice-blue);
-    color: #000;
-    padding: 12px 25px;
-    border-radius: 10px;
-    font-weight: 900;
-    z-index: 8000;
-    cursor: pointer;
-    display: none;
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
-}
-
-/* The blue play triangle icon below the button */
-#play-icon-hint {
-    position: absolute;
-    bottom: 40px;
-    left: 45px;
-    color: var(--ice-blue);
-    font-size: 2.5rem;
-    z-index: 8000;
-    display: none;
-    pointer-events: none;
-}
-
-/* The Gray Timer Circle with Blue Progress */
-#ad-timer-container {
-    position: absolute;
-    bottom: 30px;
-    right: 30px;
-    width: 65px;
-    height: 65px;
-    background: #2a2a2a;
-    border-radius: 50%;
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 5000;
-    border: 3px solid #1a1a1a;
-}
-
-#ad-timer {
-    position: absolute;
-    font-size: 1.2rem;
-    font-weight: 900;
-    color: white;
-}
-
-#timer-progress {
-    fill: none;
-    stroke: var(--ice-blue);
-    stroke-width: 8;
-    stroke-dasharray: 220; /* Fixed for the r=35 circle */
-    stroke-dashoffset: 220;
-    transition: stroke-dashoffset 0.1s linear;
-}
-
-/* Ensure the loader is GONE when it needs to be */
-.loader-wrapper {
-    position: absolute;
-    inset: 0;
-    background: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9000;
-    transition: opacity 0.4s ease;
-}
-
-
-.loader-wrapper {
-    pointer-events: none;
-    z-index: 800;
-}
-
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-
-#timer-progress {
-    fill: none;
-    stroke: var(--ice-blue);
-    stroke-width: 8;
-    stroke-dasharray: 220; /* The circumference for a 35 radius circle */
-    stroke-dashoffset: 220;
-    transition: stroke-dashoffset 0.3s linear;
-}
-
-
-    /* Ensure the main player is hidden until ads are done */
+    /* MAIN PLAYER FIXES */
     #main-player {
-        display: none;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
+      display: block !important;
+      z-index: 1;
     }
-    
-    #play-hint::after {
-        content: '';
-        position: absolute;
-        bottom: -10px;
-        left: 20px;
-        border-left: 10px solid transparent;
-        border-right: 10px solid transparent;
-        border-top: 10px solid var(--ice-blue);
-    }
+  
+.video-controls {
+  position: absolute;
+  bottom: 20px;   /* 👈 move up slightly (adjust if needed) */
+  left: 0;
+  width: 100%;
+}
+  
+#settings-gear-btn {
+  background: none !important;
+  border: none !important;
+  outline: none;
 
-    #play-icon-hint {
-        position: absolute;
-        bottom: 40px;
-        left: 45px;
-        color: var(--ice-blue);
-        font-size: 2.5rem;
-        z-index: 6500;
-        display: none;
-    }
+  color: var(--accent-main);
+  font-size: 1.8rem;
 
+  cursor: pointer;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+  padding: 8px; /* 👈 gives it a proper tap area */
+  
+  pointer-events: auto;
+  z-index: 6000;
+  
+  position: relative;
+}
+  
+  .video-overlay-top {
+  top: 0;
+  left: 0;
+}
+  
+  #next-episode-overlay {
+  position: absolute;
+  bottom: 80px;
+  right: 30px;
+  z-index: 8000;
 
-    .timer-danger #timer-progress { stroke: #ff4d4d !important; filter: drop-shadow(0 0 10px #ff4d4d); }
-    .timer-danger #ad-timer { color: #ff4d4d; text-shadow: 0 0 10px rgba(255, 77, 77, 0.5); }
-    .timer-exit { opacity: 0 !important; transform: scale(0.5) translateY(20px); }
-
-    #ad-timer { position: absolute; font-size: 1.4rem; font-weight: 900; color: white; }
-    .timer-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-    .timer-bg { fill: rgba(0, 0, 0, 0.4); stroke: rgba(255, 255, 255, 0.1); stroke-width: 8; }
-
-
-    #ad-pause-btn {
-        background: none !important; border: none !important;
-        color: var(--ice-blue) !important; font-size: 2rem !important;
-        cursor: pointer; transition: transform 0.2s ease;
-        position: absolute; bottom: 40px; left: 40px; z-index: 3500;
-    }
-    #ad-pause-btn:hover { transform: scale(1.1); filter: drop-shadow(0 0 10px var(--ice-blue)); }
-
-    #settings-menu {
-        position: absolute; top: 50%; left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(5, 7, 10, 0.95); padding: 30px;
-        border-radius: 15px; border: 1px solid var(--ice-blue);
-        z-index: 6000; display: none; width: 300px;
-        box-shadow: 0 0 30px rgba(56, 189, 248, 0.4);
-    }
-    
-    #settings-gear-btn {
-        background: none; border: none; color: var(--ice-blue);
-        font-size: 2rem; padding: 10px; cursor: pointer; z-index: 5001;
-    }
-
-    .skip-label {
-        position: absolute; top: 50%; left: 50%;
-        transform: translate(-50%, -50%);
-        background: var(--ice-blue); color: black;
-        padding: 15px 25px; border-radius: 100px;
-        font-weight: 900; z-index: 10000; pointer-events: none;
-        animation: fadeOut 0.5s forwards;
-    }
-    @keyframes fadeOut {
-        0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
-    }
-    
-    #next-episode-overlay {
-    position: absolute;
-    bottom: 50px;
-    right: 50px;
-    width: 350px;
-    background: rgba(0,0,0,0.9);
-    border: 2px solid var(--ice-blue);
-    border-radius: 12px;
-    display: none; /* Hidden by default */
-    padding: 15px;
-    z-index: 100;
-    transition: 0.3s;
+  display: none;
 }
 
-.next-timer-bar {
-    position: absolute;
-    top: 0; left: 0;
-    height: 4px;
-    background: var(--ice-blue);
-    width: 100%;
-    transition: width 10s linear;
-}
-    
-    /* Ensure the container takes up the right amount of space */
-.player-container {
-    width: 100vw; /* Full Viewport Width */
-    height: 100vh; /* Full Viewport Height */
-    max-width: 100%; 
-    background: #000;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
+.next-card {
+  background: rgba(0,0,0,0.85);
+  padding: 15px 20px;
+  border-radius: 12px;
+  border: 2px solid var(--accent-main);
 }
 
-/* The magic for the video tags */
-#main-player, #ad-video {
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* This keeps the movie's shape without stretching it */
-    position: absolute;
-    top: 0;
-    left: 0;
+.next-card button {
+  margin-top: 10px;
+  background: var(--accent-main);
+  border: none;
+  padding: 8px 12px;
+  font-weight: bold;
+  cursor: pointer;
+}
+  
+  .volume-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-/* Adjust body to prevent accidental scrolling */
-body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden; /* Stops the "Sighh, I can scroll down" problem */
-    background-color: #000;
+#volume-slider {
+  width: 70px;
+  accent-color: var(--accent-main);
 }
-    
-    /* Ensure the container takes up the right amount of space */
-.player-container {
-    width: 100vw; /* Full Viewport Width */
-    height: 100vh; /* Full Viewport Height */
-    max-width: 100%; 
-    background: #000;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
+  
+  #loading-screen {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: black;
+  z-index: 9999;
+
+  display: none;
+  justify-content: center;
+  align-items: center;
 }
 
-/* The magic for the video tags */
-#main-player, #ad-video {
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* This keeps the movie's shape without stretching it */
-    position: absolute;
-    top: 0;
-    left: 0;
+.loader {
+  border: 4px solid #333;
+  border-top: 4px solid var(--accent-main);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
 }
 
-/* Adjust body to prevent accidental scrolling */
-body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden; /* Stops the "Sighh, I can scroll down" problem */
-    background-color: #000;
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+  
+  #ad-controls {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  display: flex;
+  gap: 10px;
+  z-index: 9000;
 }
 
-    #play-hint, #play-icon-hint {
-    cursor: pointer;
-    pointer-events: auto; /* Force clicks to work */
-    z-index: 8500; /* Ensure it's above everything else */
+#ad-controls button {
+  background: none;
+  border: none;
+  color: var(--accent-main);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+  
+  #end-screen {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: black;
+  z-index: 10000;
+
+  display: none;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 
-#ad-video {
-    cursor: pointer;
-    pointer-events: auto; /* Allows clicking the video directly */
+.end-content h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
 }
 
-.loader-wrapper {
-    /* This is the most common culprit! */
-    /* When hidden, it MUST not block clicks */
-    pointer-events: none; 
+.end-buttons {
+  margin-top: 20px;
+  display: flex;
+  gap: 15px;
+  justify-content: center;
 }
-    
-    #ad-video {
-    width: 100vw;
-    height: 100vh;
-    object-fit: contain; /* Keeps the movie aspect ratio perfect */
-    background: black;  /* Fills the rest of the screen with black */
+
+.end-buttons button {
+  padding: 10px 16px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
 }
-    </style>
+
+.end-buttons button:first-child {
+  background: #333;
+  color: white;
+}
+
+.end-buttons button:last-child {
+  background: var(--accent-main);
+  color: black;
+}
+  
+  #skip-buttons {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+    z-index: 9000;
+}
+#skip-buttons.show {
+  opacity: 1;
+}
+  
+  #skip-buttons button {
+  background: rgba(0,0,0,0.8);
+  border: 2px solid var(--accent-main);
+  color: var(--accent-main);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+  
+  #caption-settings-menu {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  width: 90%;
+  max-width: 400px;
+  background: rgba(5,7,10,0.98);
+  padding: 50px 20px 25px;
+  border-radius: 20px;
+  border: 2px solid var(--accent-main);
+  z-index: 11000; /* Higher than the main settings */
+  flex-direction: column;
+  align-items: center;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 90%;
+}
+
+#caption-settings-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 1.8rem;
+  color: var(--accent-main);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+  video::cue {
+  font-size: 16px;
+  color: white;
+  background: rgba(0,0,0,0.7);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+  </style>
 </head>
 <body>
-    
 <div class="player-container" id="video-wrapper">
-    <div id="ad-overlay">
-        <div id="loader-wrapper" class="loader-wrapper">
-            <div class="loader"></div>
-        </div>
-
-        <div id="ad-content">
-            <video id="ad-video" playsinline preload="auto"></video>
-            <div id="ad-label">ADVERTISEMENT</div>
-            <div id="play-hint">TAP TO WATCH AD</div>
-            <div id="play-icon-hint"><i class="fa-solid fa-play"></i></div>
-        </div>
-
-        <div id="ad-timer-container">
-            <svg class="timer-svg" viewBox="0 0 80 80">
-                <circle class="timer-bg" cx="40" cy="40" r="35"/>
-                <circle id="timer-progress" cx="40" cy="40" r="35"/>
-            </svg>
-            <span id="ad-timer">0</span>
-        </div>
-    </div>
-
-    <video id="main-player"></video>
-
-    <div class="video-overlay-top" id="overlay-top">
-        <div style="display: flex; align-items: center; gap: 20px;">
-            <a href="/info" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
-            <div class="episode-details">
-                <span id="mini-show-title">JENNA AND TUBERS</span>
-                <h1 id="large-episode-title">S1E1: The Visitor</h1>
-            </div>
-        </div>
-        <button onclick="toggleSettings()" id="settings-gear-btn">
-            <i class="fa-solid fa-gear"></i>
-        </button>
-    </div>
-
-    <div class="video-controls" id="controls">
-        <div class="progress-area" id="progress-bar-container">
-            <div class="progress-filled" id="progress-fill"></div>
-        </div>
-        <div class="control-buttons">
-            <button onclick="togglePlay()"><i id="play-icon" class="fa-solid fa-play"></i></button>
-            <span id="time-display">0:00 / 0:00</span>
-            <div class="right-group">
-                <button onclick="toggleCaptions()"><i class="fa-solid fa-closed-captioning"></i></button>
-                <button onclick="goFullScreen()"><i class="fa-solid fa-expand"></i></button>
-            </div>
-        </div>
-    </div>
+  
+  <div id="loading-screen">
+  <div class="loader"></div>
 </div>
 
-    <script>
+  <div id="ad-overlay">
+    <div id="ad-content">
+      <video id="ad-video" playsinline preload="auto"></video>
+      <div id="ad-play-container">
+        <i class="fa-solid fa-play"></i>
+        <span>TAP TO WATCH AD</span>
+      </div>      
+      
+      <div id="ad-controls">
+  <button onclick="toggleAdPlay()"><i id="ad-play-icon" class="fa-solid fa-play"></i></button>
+  <button onclick="adFullScreen()"><i class="fa-solid fa-expand"></i></button>
+</div>
+      
+      <div id="ad-timer-container" style="display: none;">
+        <svg class="timer-svg" viewBox="0 0 80 80">
+          <circle class="timer-bg" cx="40" cy="40" r="35"></circle>
+          <circle id="timer-progress" cx="40" cy="40" r="35"></circle>
+        </svg>
+        <span id="ad-timer">-</span>
+      </div>
+    </div>
+  </div>
+
+  <video id="main-player" playsinline>
+    <track id="caption-track" kind="subtitles" srclang="en" src="https://nothingbuttylermovies.github.io/videos/captions/JennaAndTubers/JennaAndTubers_S1E1_Captions.vtt" default />
+  </video>
+
+  <div class="video-overlay-top" id="overlay-top">
+    <div style="display:flex; align-items:center; gap:20px;">
+      <a href="/info" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+      <div class="episode-details">
+        <span id="mini-show-title">JENNA AND TUBERS</span>
+        <h1 id="large-episode-title">S1E1: The Visitor</h1>
+      </div>
+    </div>
+    <button onclick="toggleSettings()" id="settings-gear-btn"><i class="fa-solid fa-gear"></i></button>
+  </div>
+  
+  <div id="seek-preview" style="display:none; position:absolute; bottom:120px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.8); padding:10px 20px; border-radius:10px; border:2px solid var(--accent-main); z-index:9000; text-align:center;">
+  <span id="preview-time" style="font-size:1.5rem; font-weight:900; color:var(--accent-main);">0:00</span>
+  <div style="font-size:0.7rem; color:white; margin-top:5px;">Press PLAY to confirm</div>
+</div>
+
+
+  <div class="video-controls" id="controls">
+    <div class="progress-area" id="progress-bar-container"><div class="progress-filled" id="progress-fill"></div></div>
+    <div class="control-buttons">
+      <button onclick="togglePlay()"><i id="play-icon" class="fa-solid fa-play"></i></button>
+      <button onclick="seekBackward()"><i class="fa-solid fa-backward"></i></button>
+<button onclick="seekForward()"><i class="fa-solid fa-forward"></i></button>
+      <span id="time-display">0:00 / 0:00</span>
+      <div class="right-group">
+        
+        <div class="volume-container">
+  <i class="fa-solid fa-volume-high"></i>
+  <input type="range" id="volume-slider" min="0" max="1" step="0.01">
+</div>
+        
+        <button onclick="toggleCaptions()"><i class="fa-solid fa-closed-captioning"></i></button>
+        <button onclick="togglePiP()"><i class="fa-solid fa-clone"></i></button>
+        <button onclick="goFullScreen()"><i class="fa-solid fa-expand"></i></button>
+      </div>
+    </div>
+  </div>
+
+</div>
+  
+        <div id="skip-buttons" style="position:absolute; bottom:80px; left:20px; display:none; gap:10px;">
+  <button onclick="skipIntro()">⏭ Skip Intro</button>
+  <button onclick="skipRecap()">⏭ Skip Recap</button>
+</div>
+  
+<div id="end-screen">
+  <div class="end-content">
+    <h1>Next Episode</h1>
+    <p>Continuing in <span id="end-countdown">10</span>s</p>
+
+    <div class="end-buttons">
+      <button onclick="cancelEndScreen()">No thanks</button>
+      <button onclick="goToNextEpisode()">Yes, continue</button>
+    </div>
+  </div>
+</div>
+
+<div id="settings-menu">
+  <h3>Settings</h3>
+  <button onclick="setTheme('blue')">Ice Blue</button>
+  <button onclick="setTheme('red')">Ice Red</button>
+  <button onclick="setTheme('green')">Ice Green</button>
+  <button onclick="openCaptionSettings()">Caption Settings</button>
+  <button onclick="restartVideo()">Restart Video</button>
+  <center><button id="settings-close-btn" onclick="closeSettings()"><i class="fa-solid fa-xmark"></i></button></center>
+</div>
+  
+  <div id="caption-settings-menu" style="display:none;">
+  <h3>Caption Settings</h3>
+  <div class="settings-grid">
+    <button onclick="changeCaptionFont()">Caption Font</button>
+    <button onclick="changeCaptionSize()">Caption Size</button>
+    <button onclick="changeCaptionBg()">Caption Background</button>
+    <button onclick="changeCaptionOpacity()">Caption Opacity</button>
+  </div>
+  <button onclick="toggleCaptions()" style="margin-top:10px; border-style:dashed;">On/Off Toggle</button>
+  <button id="caption-settings-close" onclick="closeCaptionSettings()"><i class="fa-solid fa-xmark"></i></button>
+</div>
+
+
+<script>
 const AD_URL = "https://nothingbuttylermovies.github.io/videos/ads/lv_0_20260126153800%20(1)%20(1).mp4";
-const MOVIE_URL = "https://nothingbuttylermovies.github.io/videos/JennaAndTubers/Jenna and Tubers - Mini TV show - episode 1 #shortvideo #roblox.mp4";
+const MOVIE_URL = "https://nothingbuttylermovies.github.io/videos/JennaAndTubers/Jenna%20and%20Tubers%20-%20Mini%20TV%20show%20-%20episode%201%20%23shortvideo%20%23roblox.mp4";
 const CIRCUMFERENCE = 220;
 
-const mainPlayer = document.getElementById('main-player');
-const adVideo = document.getElementById('ad-video');
-const adOverlay = document.getElementById('ad-overlay');
-const loader = document.getElementById('loader-wrapper');
-const playHint = document.getElementById('play-hint');
-const iconHint = document.getElementById('play-icon-hint');
-const timerText = document.getElementById('ad-timer');
-const timerProgress = document.getElementById('timer-progress');
-const timerContainer = document.getElementById('ad-timer-container');
-const controls = document.getElementById('controls');
-const overlayTop = document.getElementById('overlay-top');
-const playIcon = document.getElementById('play-icon');
-const timeDisplay = document.getElementById('time-display');
-const progressContainer = document.getElementById('progress-bar-container');
-const progressFill = document.getElementById('progress-fill');
-const wrapper = document.getElementById('video-wrapper');
+/* ELEMENTS */
+const adOverlay = document.getElementById("ad-overlay");
+const adVideo = document.getElementById("ad-video");
+const adPlayContainer = document.getElementById("ad-play-container"); 
+const mainPlayer = document.getElementById("main-player");
+const timerContainer = document.getElementById("ad-timer-container");
+const timerText = document.getElementById("ad-timer");
+const timerProgress = document.getElementById("timer-progress");
+const controls = document.getElementById("controls");
+const overlayTop = document.getElementById("overlay-top");
+const progressContainer = document.getElementById("progress-bar-container");
+const progressFill = document.getElementById("progress-fill");
+const playIcon = document.getElementById("play-icon");
+const timeDisplay = document.getElementById("time-display");
+const settingsMenu = document.getElementById("settings-menu");
+  
+const nextOverlay = document.getElementById("next-episode-overlay");
+const countdownEl = document.getElementById("countdown");
+  
+  let adMode = "tap"; 
+// "tap" = waiting for user
+// "playing" = ad is playing
+// "ended" = ad finished
 
-let adsFinished = false;
-let userStartedMovie = false;
+let nextTriggered = false;
+let nextCanceled = false;
+let countdownInterval = null;
 
-function initTheater() {
-    loader.style.opacity = '1';
-    adOverlay.style.display = 'flex';
-    adVideo.src = AD_URL;
-    adVideo.load();
-    mainPlayer.src = MOVIE_URL;
-    mainPlayer.preload = 'metadata';
+/* STATE */
+let started = false;
+let adFinished = false;
+let controlsTimeout;
 
-    setTimeout(() => {
-        loader.style.opacity = '0';
-        setTimeout(() => loader.style.display = 'none', 400);
+/* INIT */
+window.addEventListener("load", () => {
+  adOverlay.style.display = "flex";
 
-        playHint.style.display = 'block';
-        iconHint.style.display = 'block';
-    }, 500);
-}
+  const adControls = document.getElementById("ad-controls");
 
-// Single click handler for everything
+  // ✅ Only tap is active
+  adControls.style.display = "none";
+  adControls.style.pointerEvents = "none";
+
+  adPlayContainer.style.display = "flex";
+  adPlayContainer.style.pointerEvents = "auto";
+
+  adVideo.src = AD_URL;
+  mainPlayer.src = MOVIE_URL;
+
+  const savedTheme = localStorage.getItem("theme") || "blue";
+  setTheme(savedTheme);
+});
+
+/* 1. START PLAYBACK */
 function startPlayback() {
-    playHint.style.display = 'none';
-    iconHint.style.display = 'none';
+  if (started) return;
+  started = true;
 
-    mainPlayer.muted = true;
-    mainPlayer.style.display = 'block';
-    mainPlayer.play().catch(err => console.warn("Main play blocked:", err));
+  adMode = "playing";
 
-    adOverlay.style.display = 'flex';
-    adVideo.muted = true;
-    adVideo.style.display = 'block';
-    timerContainer.style.display = 'flex';
-    adVideo.play().catch(err => console.warn("Ad play blocked:", err));
+  // ❌ Disable tap UI completely
+  adPlayContainer.style.display = "none";
+  adPlayContainer.style.pointerEvents = "none";
 
-    adVideo.addEventListener('ended', () => {
-        adsFinished = true;
-        adOverlay.style.display = 'none';
-        mainPlayer.muted = false;
-        controls.classList.add('active');
-        overlayTop.classList.add('active');
-    }, { once: true });
+  // ✅ Enable ad controls
+  const adControls = document.getElementById("ad-controls");
+  adControls.style.display = "flex";
+  adControls.style.pointerEvents = "auto";
 
-    playHint.removeEventListener('click', startPlayback);
-    iconHint.removeEventListener('click', startPlayback);
+  // Unlock main player
+  mainPlayer.play().then(() => {
+    mainPlayer.pause();
+  });
+
+  // Start ad
+  adVideo.style.opacity = "1";
+  adVideo.muted = false;
+
+  adVideo.play().then(() => {
+    timerContainer.style.display = "flex";
+  }).catch(() => {
+    adVideo.dispatchEvent(new Event("ended"));
+  });
+
+
+
+
+  // 3. Start the Ad
+  adVideo.style.opacity = "1";
+  adVideo.muted = false;
+
+  adVideo.play().then(() => {
+    timerContainer.style.display = "flex";
+  }).catch((err) => {
+    console.error("Ad blocked", err);
+    adVideo.dispatchEvent(new Event('ended'));
+  });
+}
+  
+  
+  
+  /* 2. LISTENERS & TIMER (MISSING PART) */
+adPlayContainer.addEventListener("click", () => {
+  hideAdTapUI();
+  startPlayback();
+});
+
+adVideo.addEventListener("timeupdate", () => {
+  if (!adVideo.duration) return;
+  const remaining = Math.ceil(adVideo.duration - adVideo.currentTime);
+  timerText.textContent = remaining;
+  const progress = adVideo.currentTime / adVideo.duration;
+  timerProgress.style.strokeDashoffset = CIRCUMFERENCE - progress * CIRCUMFERENCE;
+});
+  
+  const skipButtons = document.getElementById("skip-buttons");
+
+
+  // (Optional recap — currently none)
+  
+    
+
+// time update listener
+  
+  mainPlayer.addEventListener("timeupdate", () => {
+  if (!adFinished) return;
+
+  const t = mainPlayer.currentTime;
+
+  if (t >= INTRO_START && t <= INTRO_END) {
+    skipButtons.style.display = "flex";
+  } else {
+    skipButtons.style.display = "none";
+  }
+});
+
+  
+
+
+
+  // 🔥 HARD DISABLE EVERYTHING AD RELATED
+  adPlayContainer.style.display = "none";
+  adPlayContainer.style.pointerEvents = "none";
+
+  const adControls = document.getElementById("ad-controls");
+  adControls.style.display = "none";
+  adControls.style.pointerEvents = "none";
+
+  timerContainer.style.display = "none";
+
+  mainPlayer.style.zIndex = "10";
+  mainPlayer.muted = false;
+  mainPlayer.currentTime = 0;
+
+  mainPlayer.play().then(() => {
+    showControls();
+  });
+
+
+
+/* PLAYER CONTROLS */
+function togglePlay() { 
+  mainPlayer.paused ? mainPlayer.play() : mainPlayer.pause(); 
 }
 
-// Timer update
-adVideo.addEventListener('loadedmetadata', () => timerText.textContent = Math.ceil(adVideo.duration));
-adVideo.addEventListener('timeupdate', () => {
-    if (!adVideo.duration) return;
-    const remaining = Math.ceil(adVideo.duration - adVideo.currentTime);
-    timerText.textContent = remaining;
-    const progress = adVideo.currentTime / adVideo.duration;
-    timerProgress.style.strokeDashoffset = CIRCUMFERENCE - (progress * CIRCUMFERENCE);
-    if (remaining <= 5) timerContainer.classList.add('timer-danger');
+mainPlayer.addEventListener("play", () => { 
+  playIcon.className = "fa-solid fa-pause"; 
+  showControls(); 
+});
+  
+  mainPlayer.addEventListener("play", () => {
+  nextEpisodeCancelled = false;
 });
 
-// Main video events
-mainPlayer.addEventListener('play', () => playIcon.className = 'fa-solid fa-pause');
-mainPlayer.addEventListener('pause', () => playIcon.className = 'fa-solid fa-play');
-mainPlayer.addEventListener('loadedmetadata', () => timeDisplay.textContent = `0:00 / ${formatTime(mainPlayer.duration)}`);
-mainPlayer.addEventListener('timeupdate', () => {
-    if (!mainPlayer.duration) return;
-    const percent = (mainPlayer.currentTime / mainPlayer.duration) * 100;
-    progressFill.style.width = percent + '%';
-    timeDisplay.textContent = `${formatTime(mainPlayer.currentTime)} / ${formatTime(mainPlayer.duration)}`;
+mainPlayer.addEventListener("pause", () => { 
+  playIcon.className = "fa-solid fa-play"; 
+  showControls(); 
 });
-progressContainer.addEventListener('click', e => {
-    const rect = progressContainer.getBoundingClientRect();
-    const percent = (e.clientX - rect.left) / rect.width;
-    mainPlayer.currentTime = percent * mainPlayer.duration;
+  
+mainPlayer.addEventListener("ended", () => {
+  showEndScreen();
 });
 
-function formatTime(sec) { const m = Math.floor(sec / 60); const s = Math.floor(sec % 60); return `${m}:${s.toString().padStart(2,'0')}`; }
-function togglePlay() { if (mainPlayer.paused) mainPlayer.play().catch(err=>console.error("Play failed:", err)); else mainPlayer.pause(); }
-function goFullScreen() { if(document.fullscreenElement){document.exitFullscreen();}else{wrapper.requestFullscreen().catch(()=>console.warn("Fullscreen failed"));}}
-document.addEventListener('keydown', e => { if(e.target.tagName==='INPUT') return; if(e.code==='Space'){e.preventDefault();togglePlay();} if(e.code==='ArrowRight') mainPlayer.currentTime+=5; if(e.code==='ArrowLeft') mainPlayer.currentTime-=5; if(e.code==='KeyF') goFullScreen(); });
+function showControls() {
+  if (!adFinished) return;
 
-// START EVERYTHING on click
-playHint.addEventListener('click', startPlayback);
-iconHint.addEventListener('click', startPlayback);
+  controls.classList.add("active");
+  overlayTop.classList.add("active");
+
+  clearTimeout(controlsTimeout);
+
+  controlsTimeout = setTimeout(() => {
+    if (!mainPlayer.paused && !settingsMenu.classList.contains("visible")) {
+      controls.classList.remove("active");
+      overlayTop.classList.remove("active");
+    }
+  }, 3000);
+}
+
+function hideControls() {
+  if (settingsMenu.classList.contains("visible")) return;
+  controls.classList.remove("active");
+  overlayTop.classList.remove("active");
+}
+
+document.addEventListener("mousemove", () => {
+  if (!adFinished) return;
+  showControls();
+});
+
+document.addEventListener("touchstart", () => {
+  if (!adFinished) return;
+  showControls();
+});
+
+/* TIME + PROGRESS */
+function formatTime(sec) {
+  if (!sec || isNaN(sec)) return "0:00";
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+mainPlayer.addEventListener("timeupdate", () => {
+  if (!mainPlayer.duration) return;
+
+  const percent = (mainPlayer.currentTime / mainPlayer.duration) * 100;
+  progressFill.style.width = percent + "%";
+
+  timeDisplay.textContent =
+    `${formatTime(mainPlayer.currentTime)} / ${formatTime(mainPlayer.duration)}`;
+});
+
+progressContainer.addEventListener("click", e => {
+  const rect = progressContainer.getBoundingClientRect();
+  const percent = (e.clientX - rect.left) / rect.width;
+  mainPlayer.currentTime = percent * mainPlayer.duration;
+});
+
+/* SETTINGS */
+function toggleSettings() {
+  if (!adFinished) return; // Block settings during ad
+  settingsMenu.classList.toggle("visible");
+  
+  if (settingsMenu.classList.contains("visible")) {
+    clearTimeout(controlsTimeout);
+    controls.classList.add("active");
+    overlayTop.classList.add("active");
+  } else {
+    showControls();
+  }
+}
+
+function closeSettings() { 
+  settingsMenu.classList.remove("visible"); 
+  showControls();
+}
+
+function setTheme(theme) {
+  document.body.classList.remove("theme-red", "theme-green");
+  if (theme === "red") document.body.classList.add("theme-red");
+  if (theme === "green") document.body.classList.add("theme-green");
+  localStorage.setItem("theme", theme);
+}
+
+function restartVideo() { 
+  mainPlayer.currentTime = 0; 
+  mainPlayer.play(); 
+  closeSettings();
+}
+
+function goFullScreen() {
+  const wrapper = document.getElementById("video-wrapper");
+  if (!document.fullscreenElement) wrapper.requestFullscreen();
+  else document.exitFullscreen();
+}
+  
+  
+  // Next Episode Overlay
+  
+const endScreen = document.getElementById("end-screen");
+const endCountdownEl = document.getElementById("end-countdown");
+
+let endCountdown = 10;
+let endInterval = null;
+let endCancelled = false;
+  
+  /* Next screen */
+  
+  function showEndScreen() {
+  endScreen.style.display = "flex";
+  endCountdown = 10;
+  endCancelled = false;
+
+  endCountdownEl.textContent = endCountdown;
+
+  endInterval = setInterval(() => {
+    if (endCancelled) return;
+
+    endCountdown--;
+    endCountdownEl.textContent = endCountdown;
+
+    if (endCountdown <= 0) {
+      clearInterval(endInterval);
+      goToNextEpisode();
+    }
+  }, 1000);
+}
+  
+  /* Cancel Button */
+  
+  function cancelEndScreen() {
+  endCancelled = true;
+  clearInterval(endInterval);
+
+  endScreen.style.display = "none";
+
+  // 🔥 Turn play button into replay
+  playIcon.className = "fa-solid fa-rotate-left";
+
+  mainPlayer.currentTime = 0;
+}
+  
+  /* Continue button */
+  
+  function goToNextEpisode() {
+  const loading = document.getElementById("loading-screen");
+  loading.style.display = "flex";
+
+  setTimeout(() => {
+    window.location.href = "NEXT_EPISODE_URL_HERE";
+  }, 2000);
+}
+  
+  // Volume Slider
+  
+  const volumeSlider = document.getElementById("volume-slider");
+
+volumeSlider.value = 1;
+
+volumeSlider.addEventListener("input", () => {
+  mainPlayer.volume = volumeSlider.value;
+
+  localStorage.setItem("volume", volumeSlider.value);
+});
+  
+const savedVolume = localStorage.getItem("volume");
+
+if (savedVolume !== null) {
+  mainPlayer.volume = parseFloat(savedVolume);
+  volumeSlider.value = savedVolume;
+}
+  
+  // Save progress Script
+  
+  function saveProgress() {
+  localStorage.setItem("progress-" + MOVIE_URL, mainPlayer.currentTime);
+}
+
+// Save during playback (throttled)
+let lastSave = 0;
+mainPlayer.addEventListener("timeupdate", () => {
+  const now = Date.now();
+  if (now - lastSave > 1000) {
+    saveProgress();
+    lastSave = now;
+  }
+});
+
+// Save when pausing
+mainPlayer.addEventListener("pause", saveProgress);
+
+// Save when leaving page
+window.addEventListener("beforeunload", saveProgress);
+  
+  mainPlayer.addEventListener("loadedmetadata", () => {
+  timeDisplay.textContent = `0:00 / ${formatTime(mainPlayer.duration)}`;
+
+  const savedTime = localStorage.getItem("progress-" + MOVIE_URL);
+
+  if (savedTime && parseFloat(savedTime) < mainPlayer.duration - 5) {
+    mainPlayer.currentTime = parseFloat(savedTime);
+  }
+});
+  
+  
+// Loading screen redirect to next episode
+  
+
+
+mainPlayer.addEventListener("timeupdate", () => {
+  if (!adFinished) return; // 🚫 BLOCK during ads
+  if (!mainPlayer.duration) return;
+  if (mainPlayer.paused) return; // 🚫 BLOCK when paused
+
+  const timeLeft = mainPlayer.duration - mainPlayer.currentTime;
+
+  if (timeLeft <= 10 && !nextTriggered && !nextCanceled) {
+    startNextEpisodeCountdown();
+  }
+});
+
+
+
+function cancelNextEpisode() {
+  nextCanceled = true;
+  nextTriggered = true;
+
+  clearInterval(countdownInterval);
+  
+}
+
+function goToNextEpisode() {
+  const loading = document.getElementById("loading-screen");
+  loading.style.display = "flex";
+
+  setTimeout(() => {
+    window.location.href = "NEXT_EPISODE_URL_HERE";
+  }, 2000);
+}
+  
+  // Rewind/Fast Forwarding Script
+  
+  function seekBackward() {
+  mainPlayer.pause();
+  mainPlayer.currentTime = Math.max(0, mainPlayer.currentTime - 10);
+}
+
+function seekForward() {
+  mainPlayer.pause();
+  mainPlayer.currentTime = Math.min(mainPlayer.duration, mainPlayer.currentTime + 10);
+}
+  
+  // Ad Play & Fullscreen Controls for Ad Player
+  
+  
+  const adPlayIcon = document.getElementById("ad-play-icon");
+
+function toggleAdPlay() {
+  if (adVideo.paused) {
+    adVideo.play();
+  } else {
+    adVideo.pause();
+  }
+}
+
+adVideo.addEventListener("play", () => {
+  adPlayIcon.className = "fa-solid fa-pause";
+});
+
+adVideo.addEventListener("pause", () => {
+  adPlayIcon.className = "fa-solid fa-play";
+});
+
+function adFullScreen() {
+  if (!document.fullscreenElement) {
+    adVideo.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
+  
+  
+if (nextOverlay) {
+  nextOverlay.style.display = "none";
+}
+  
+  // other
+  
+  function hideAdTapUI() {
+  if (adPlayContainer) adPlayContainer.style.display = "none";
+}
+  
+  mainPlayer.addEventListener("pause", () => {
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+  }
+});
+
+mainPlayer.addEventListener("play", () => {
+  if (nextTriggered && !nextCanceled) {
+    startNextEpisodeCountdown(); // resume countdown
+  }
+});
+  
+  const adControlsEl = document.getElementById("ad-controls");
+
+if (adControlsEl) {
+  adControlsEl.style.pointerEvents = "auto";
+  adControlsEl.style.display = "none";
+}
+  
+  mainPlayer.addEventListener("play", () => {
+  if (mainPlayer.currentTime < 2) {
+    nextTriggered = false;
+    nextCanceled = false;
     
-    playHint.addEventListener('click', startPlayback);
-playHint.addEventListener('touchend', startPlayback);
-iconHint.addEventListener('click', startPlayback);
-iconHint.addEventListener('touchend', startPlayback);
+  }
+});
+  
+  adVideo.addEventListener("ended", () => {
+  adFinished = true;
 
-window.addEventListener('load', initTheater);
+  adOverlay.style.display = "none";
+
+  adPlayContainer.style.display = "none";
+  adPlayContainer.style.pointerEvents = "none";
+
+  const adControls = document.getElementById("ad-controls");
+  adControls.style.display = "none";
+  adControls.style.pointerEvents = "none";
+
+  timerContainer.style.display = "none";
+
+  mainPlayer.style.zIndex = "10";
+  mainPlayer.muted = false;
+  mainPlayer.currentTime = 0;
+
+  mainPlayer.play().then(() => {
+    showControls();
+  });
+});
+  
+  // Skip Intro/Recap Logic
+  
+  const INTRO_START = 0;
+const INTRO_END = 3;
+
+const RECAP_START = 20;
+const RECAP_END = 40;
+  
+  // Skip Intro/Recap Functions
+  
+  function skipIntro() {
+  mainPlayer.currentTime = INTRO_END;
+}
+
+function skipRecap() {
+  mainPlayer.currentTime = RECAP_END;
+}
+  
+// Preview Seek Logic
+  
+  /* KEYBOARD CONTROLS & SEEK PREVIEW */
+const seekPreview = document.getElementById("seek-preview");
+const previewTimeDisplay = document.getElementById("preview-time");
+let isSeeking = false;
+let tempSeekTime = 0;
+
+document.addEventListener("keydown", (e) => {
+  if (!adFinished) return; // Block during ads
+
+  if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+    if (!isSeeking) {
+      isSeeking = true;
+      tempSeekTime = mainPlayer.currentTime;
+      mainPlayer.pause(); // Pause while they "scrub"
+      seekPreview.style.display = "block";
+    }
+
+    const step = 5; // seconds per tap
+    if (e.key === "ArrowLeft") tempSeekTime = Math.max(0, tempSeekTime - step);
+    if (e.key === "ArrowRight") tempSeekTime = Math.min(mainPlayer.duration, tempSeekTime + step);
+
+    previewTimeDisplay.textContent = formatTime(tempSeekTime);
+  }
+
+  if (e.key === " " || e.key === "Enter") {
+    if (isSeeking) {
+      mainPlayer.currentTime = tempSeekTime;
+      isSeeking = false;
+      seekPreview.style.display = "none";
+      mainPlayer.play();
+    } else {
+      togglePlay();
+    }
+  }
+});
+
+  // Captions Settings (Logic and Etc)
+  // 1. logic
+  
+  const captionMenu = document.getElementById("caption-settings-menu");
+
+function openCaptionSettings() {
+  settingsMenu.classList.remove("visible");
+  captionMenu.style.display = "flex";
+}
+
+function closeCaptionSettings() {
+  captionMenu.style.display = "none";
+  settingsMenu.classList.add("visible");
+}
+
+// Quick placeholder functions for the new buttons
+  
+  
+// 2. Real Working Captions Settings
+  
+  // a. Font size Changer
+  
+  let captionSize = 16;
+
+function changeCaptionSize() {
+  captionSize += 2;
+  if (captionSize > 28) captionSize = 14;
+
+  document.styleSheets[0].insertRule(`
+    video::cue {
+      font-size: ${captionSize}px;
+    }
+  `, document.styleSheets[0].cssRules.length);
+}
+  
+  // b. Background toggle
+  
+  let bgDark = true;
+
+function changeCaptionBg() {
+  bgDark = !bgDark;
+
+  const bg = bgDark ? "rgba(0,0,0,0.7)" : "transparent";
+
+  document.styleSheets[0].insertRule(`
+    video::cue {
+      background: ${bg};
+    }
+  `, document.styleSheets[0].cssRules.length);
+}
+  
+  // c. Opacity control
+  
+  let opacity = 0.7;
+
+function changeCaptionOpacity() {
+  opacity -= 0.2;
+  if (opacity < 0.2) opacity = 1;
+
+  document.styleSheets[0].insertRule(`
+    video::cue {
+      background: rgba(0,0,0,${opacity});
+    }
+  `, document.styleSheets[0].cssRules.length);
+}
+  
+  // d. font Family switcher
+  
+  let fontIndex = 0;
+const fonts = ["Inter", "Arial", "Courier New"];
+
+function changeCaptionFont() {
+  fontIndex = (fontIndex + 1) % fonts.length;
+
+  document.styleSheets[0].insertRule(`
+    video::cue {
+      font-family: ${fonts[fontIndex]};
+    }
+  `, document.styleSheets[0].cssRules.length);
+}
+  
+  // e. save settings script
+  
+  localStorage.setItem("captionSize", captionSize);
+localStorage.setItem("captionFont", fonts[fontIndex]);
+
+  // 2. Script
+  
+  const track = document.getElementById("caption-track");
+const textTrack = mainPlayer.textTracks[0];
+  
+  function toggleCaptions() {
+  if (textTrack.mode === "showing") {
+    textTrack.mode = "hidden";
+  } else {
+    textTrack.mode = "showing";
+  }
+}
 </script>
-    
 </body>
 </html>
