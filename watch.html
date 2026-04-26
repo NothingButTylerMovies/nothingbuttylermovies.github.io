@@ -1,1046 +1,1133 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Watch {Episode_Name} | NothingButTyler Movies</title>
-  <script src="https://kit.fontawesome.com/eeb01edac2.js" crossorigin="anonymous"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --ice-blue: #38bdf8;
-      --accent-main: var(--ice-blue);
-      --accent-glow: rgba(56,189,248,0.6);
-    }
-    body.theme-red { --accent-main: #ff4d4d; --accent-glow: rgba(255,77,77,0.6); }
-    body.theme-green { --accent-main: #00ff88; --accent-glow: rgba(0,255,136,0.6); }
-
-    body { margin:0; font-family:'Inter', sans-serif; background:#000; color:#fff; display:flex; flex-direction:column; align-items:center; min-height:100vh; overflow:hidden; }
-    html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; }
-
-    video { width:100%; height:100%; object-fit:contain; position:absolute; top:0; left:0; }
-
-    /* AD OVERLAY */
-    #ad-overlay { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:black; z-index:2000; justify-content:center; align-items:center; pointer-events:auto; }
-    #ad-content { position:relative; width:100%; height:100%; display:flex; justify-content:center; align-items:center; }
-
-    #ad-video { 
-      width: 100%; 
-      height: 100%; 
-      object-fit: contain; 
-      background: black; 
-      position: absolute; 
-      top: 0;             
-      left: 0;            
-      z-index: 10;        
-    }
-
-    #ad-timer-container { position:absolute; bottom:30px; right:30px; width:65px; height:65px; background:#2a2a2a; border-radius:50%; display:flex; justify-content:center; align-items:center; z-index:5000; border:3px solid #1a1a1a; }
-    .timer-svg { width:100%; height:100%; transform:rotate(-90deg); }
-    .timer-bg { fill: rgba(0,0,0,0.4); stroke: rgba(255,255,255,0.1); stroke-width:8; }
-    #timer-progress { fill:none; stroke:var(--accent-main); stroke-width:8; stroke-dasharray:220; stroke-dashoffset:220; transition:stroke-dashoffset 0.1s linear; }
-    #ad-timer { position:absolute; font-size:1.4rem; font-weight:900; color:white; }
-
-    #ad-play-container {
-      position: absolute;
-      bottom: 30px;
-      left: 30px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--accent-main);
-      font-weight: 700;
-      font-size: 1rem;
-      cursor: pointer;
-      z-index: 9000;
-    }
-    #ad-play-container i { font-size: 1.6rem; }
-    #ad-play-container:hover { transform: scale(1.05); }
-
-    /* CONTROLS */
-    .player-container { width:100vw; height:100svh; position:relative; overflow:hidden; background:#000; }
-    .video-controls, .video-overlay-top { position:absolute; width:100%; box-sizing:border-box; display:flex; flex-direction:column; gap:10px; opacity:0; pointer-events:none; transition:opacity 0.25s ease; z-index:5000; }
-    .video-controls.active, .video-overlay-top.active { opacity:1; pointer-events:auto; }
-
-    .video-overlay-top { top:0; flex-direction:row; justify-content:/*flex-start*/ space-between; gap:20px; padding:10px; align-items: center; }
-    .back-btn { color:white; text-decoration:none; font-size:1.5rem; width:45px; height:45px; display:flex; justify-content:center; align-items:center; border-radius:50%; background:rgba(255,255,255,0.1); transition:0.3s; }
-    .back-btn:hover { background:var(--accent-main); }
-
-    .episode-details { margin-left:20px; }
-    #mini-show-title { color:var(--accent-main); font-weight:900; text-transform:uppercase; font-size:0.75rem; letter-spacing:2px; }
-    #large-episode-title { font-size:1.2rem; margin:0; text-shadow:2px 2px 4px rgba(0,0,0,0.8); }
-
-    .control-buttons { display:flex; justify-content:/*space-between*/ flex-start; align-items:center; width:100%; gap:14px; }
-    .right-group { margin-left: auto; display:flex; gap:14px; flex-shrink:0; }
-    .control-buttons button { background:none; border:none; color:var(--accent-main); font-size:1.8rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform 0.2s ease, filter 0.3s ease; }
-    .control-buttons button:hover { transform:scale(1.1); filter:drop-shadow(0 0 10px var(--accent-main)); }
-    #time-display { font-size:1rem; font-weight:700; color:white; margin-left:10px; }
-
-    .progress-area {
-  width: 100%;
-  height: 6px;
-  display: flex;
-  align-items: center;
-      margin-bottom: 2px;
-}  
-  .progress-filled { height:100%; width:0%; background:var(--accent-main); border-radius:10px; }
-
-    /* SETTINGS MENU */
-    #settings-menu { 
-      display: none; 
-      position: fixed; 
-      top: 50%; 
-      left: 50%; 
-      transform: translate(-50%,-50%); 
-      width: 90%;
-      max-width: 400px;
-      background: rgba(5,7,10,0.95); 
-      padding: 50px 20px 25px; 
-      border-radius: 20px; 
-      border: 2px solid var(--accent-main); 
-      z-index: 10000; 
-      flex-direction: column;
-      align-items: center;
-    }
-    #settings-menu.visible { display: flex !important; }
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+  <meta charset="UTF-8">  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">  
+  <title>Watch Jenna and Tubers: S1E1: The Visitor | NothingButTyler Movies</title>  
+  <script src="https://kit.fontawesome.com/eeb01edac2.js" crossorigin="anonymous"></script>  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">  
+  <style>  
+    :root {  
+      --ice-blue: #38bdf8;  
+      --accent-main: var(--ice-blue);  
+      --accent-glow: rgba(56,189,248,0.6);  
+        
+      /* Captions part */  
+        
+        --caption-size: 22px;  
+  --caption-color: #ffffff;  
+  --caption-opacity: 1;  
+  
+  --caption-bg: rgba(0,0,0,0.7);  
+  
+  --caption-font: 'Inter', sans-serif;  
+  
+  --caption-edge: none;  
+        
+    }  
+    body.theme-red { --accent-main: #ff4d4d; --accent-glow: rgba(255,77,77,0.6); }  
+    body.theme-green { --accent-main: #00ff88; --accent-glow: rgba(0,255,136,0.6); }  
+  
+    body { margin:0; font-family:'Inter', sans-serif; background:#000; color:#fff; display:flex; flex-direction:column; align-items:center; min-height:100vh; overflow:hidden; }  
+    html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; }  
+  
+    video { width:100%; height:100%; object-fit:contain; position:absolute; top:0; left:0; }  
+  
+    /* AD OVERLAY */  
+    #ad-overlay { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:black; z-index:2000; justify-content:center; align-items:center; pointer-events:auto; }  
+    #ad-content { position:relative; width:100%; height:100%; display:flex; justify-content:center; align-items:center; }  
+  
+    #ad-video {   
+      width: 100%;   
+      height: 100%;   
+      object-fit: contain;   
+      background: black;   
+      position: absolute;   
+      top: 0;               
+      left: 0;              
+      z-index: 10;          
+    }  
+  
+    #ad-timer-container { position:absolute; bottom:30px; right:30px; width:65px; height:65px; background:#2a2a2a; border-radius:50%; display:flex; justify-content:center; align-items:center; z-index:5000; border:3px solid #1a1a1a; }  
+    .timer-svg { width:100%; height:100%; transform:rotate(-90deg); }  
+    .timer-bg { fill: rgba(0,0,0,0.4); stroke: rgba(255,255,255,0.1); stroke-width:8; }  
+    #timer-progress { fill:none; stroke:var(--accent-main); stroke-width:8; stroke-dasharray:220; stroke-dashoffset:220; transition:stroke-dashoffset 0.1s linear; }  
+    #ad-timer { position:absolute; font-size:1.4rem; font-weight:900; color:white; }  
+  
+    #ad-play-container {  
+      position: absolute;  
+      bottom: 30px;  
+      left: 30px;  
+      display: flex;  
+      align-items: center;  
+      gap: 10px;  
+      color: var(--accent-main);  
+      font-weight: 700;  
+      font-size: 1rem;  
+      cursor: pointer;  
+      z-index: 9000;  
+    }  
+    #ad-play-container i { font-size: 1.6rem; }  
+    #ad-play-container:hover { transform: scale(1.05); }  
+  
+    /* CONTROLS */  
+    .player-container { width:100vw; height:100svh; position:relative; overflow:hidden; background:#000; }  
+    .video-controls, .video-overlay-top { position:absolute; width:100%; box-sizing:border-box; display:flex; flex-direction:column; gap:10px; opacity:0; pointer-events:none; transition:opacity 0.25s ease; z-index:5000; }  
+    .video-controls.active, .video-overlay-top.active { opacity:1; pointer-events:auto; }  
+  
+    .video-overlay-top { top:0; flex-direction:row; justify-content:/*flex-start*/ space-between; gap:20px; padding:10px; align-items: center; }  
+    .back-btn { color:white; text-decoration:none; font-size:1.5rem; width:45px; height:45px; display:flex; justify-content:center; align-items:center; border-radius:50%; background:rgba(255,255,255,0.1); transition:0.3s; }  
+    .back-btn:hover { background:var(--accent-main); }  
+  
+    .episode-details { margin-left:20px; }  
+    #mini-show-title { color:var(--accent-main); font-weight:900; text-transform:uppercase; font-size:0.75rem; letter-spacing:2px; }  
+    #large-episode-title { font-size:1.2rem; margin:0; text-shadow:2px 2px 4px rgba(0,0,0,0.8); }  
+  
+    /* justify-content could be space-between */  
+.control-buttons { display:flex; justify-content:flex-start; align-items:center; width:100%; gap:14px; }  
+    .right-group { margin-left: auto; display:flex; gap:14px; flex-shrink:0; }  
+    .control-buttons button { background:none; border:none; color:var(--accent-main); font-size:1.8rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform 0.2s ease, filter 0.3s ease; }  
+    .control-buttons button:hover { transform:scale(1.1); filter:drop-shadow(0 0 10px var(--accent-main)); }  
+    #time-display { font-size:1rem; font-weight:700; color:white; margin-left:10px; }  
+  
+    .progress-area {  
+  width: 100%;  
+  height: 6px;  
+  display: flex;  
+  align-items: center;  
+      margin-bottom: 2px;  
+}    
+  .progress-filled { height:100%; width:0%; background:var(--accent-main); border-radius:10px; }  
+  
+    /* SETTINGS MENU */  
+    #settings-menu {   
+      display: none;   
+      position: fixed;   
+      top: 50%;   
+      left: 50%;   
+      transform: translate(-50%,-50%);   
+      width: 90%;  
+      max-width: 400px;  
+      background: rgba(5,7,10,0.95);   
+      padding: 50px 20px 25px;   
+      border-radius: 20px;   
+      border: 2px solid var(--accent-main);   
+      z-index: 9999;   
+      flex-direction: column;  
+      align-items: center;  
+    }  
+    #settings-menu.visible { display: flex !important; }  
+      
+    #settings-close-btn { position:absolute; top:0; right:0; font-size:1.8rem; color:var(--accent-main); background:none; border:none; cursor:pointer; z-index:10000; }  
+    #settings-menu button { width:90%; font-size:0.9rem; padding:10px 12px; margin-bottom:10px; color:var(--accent-main); border:2px solid var(--accent-main); border-radius:12px; background:rgba(0,0,0,0.8); font-weight:700; cursor:pointer; box-shadow:0 0 15px var(--accent-glow); }  
+    #settings-menu button:hover { background:var(--accent-main); color:#000; box-shadow:0 0 25px var(--accent-glow); }  
+  
+    @media (max-width:768px) {  
+      #settings-menu { width: 85%; max-height: 80vh; padding: 20px; }  
+    }  
+  
+    /* PLAY ICON FORCE COLOR */  
+    #play-icon, button i { color:var(--accent-main) !important; }  
+  
+    /* MAIN PLAYER FIXES */  
+    #main-player {  
+      display: block !important;  
+      z-index: 5;  
+    }  
     
-    #settings-close-btn { position:absolute; top:0; right:0; font-size:1.8rem; color:var(--accent-main); background:none; border:none; cursor:pointer; z-index:10001; }
-    #settings-menu button { width:90%; font-size:0.9rem; padding:10px 12px; margin-bottom:10px; color:var(--accent-main); border:2px solid var(--accent-main); border-radius:12px; background:rgba(0,0,0,0.8); font-weight:700; cursor:pointer; box-shadow:0 0 15px var(--accent-glow); }
-    #settings-menu button:hover { background:var(--accent-main); color:#000; box-shadow:0 0 25px var(--accent-glow); }
-
-    @media (max-width:768px) {
-      #settings-menu { width: 85%; max-height: 80vh; padding: 20px; }
-    }
-
-    /* PLAY ICON FORCE COLOR */
-    #play-icon, button i { color:var(--accent-main) !important; }
-
-    /* MAIN PLAYER FIXES */
-    #main-player {
-      display: block !important;
-      z-index: 1;
-    }
+.video-controls {  
+  position: absolute;  
+  bottom: 20px;   /* 👈 move up slightly (adjust if needed) */  
+  left: 0;  
+  width: 100%;  
+}  
+    
+#settings-gear-btn {  
+  background: none !important;  
+  border: none !important;  
+  outline: none;  
   
-.video-controls {
-  position: absolute;
-  bottom: 20px;   /* 👈 move up slightly (adjust if needed) */
-  left: 0;
-  width: 100%;
-}
+  color: var(--accent-main);  
+  font-size: 1.8rem;  
   
-#settings-gear-btn {
-  background: none !important;
-  border: none !important;
-  outline: none;
-
-  color: var(--accent-main);
-  font-size: 1.8rem;
-
-  cursor: pointer;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 8px; /* 👈 gives it a proper tap area */
+  cursor: pointer;  
   
-  pointer-events: auto;
-  z-index: 6000;
+  display: flex;  
+  align-items: center;  
+  justify-content: center;  
   
-  position: relative;
-}
+  padding: 8px; /* 👈 gives it a proper tap area */  
+    
+  pointer-events: auto;  
+  z-index: 6000;  
+    
+  position: relative;  
+}  
+    
+  .video-overlay-top {  
+  top: 0;  
+  left: 0;  
+}  
+    
+  #next-episode-overlay {  
+  position: absolute;  
+  bottom: 80px;  
+  right: 30px;  
+  z-index: 8000;  
   
-  .video-overlay-top {
-  top: 0;
-  left: 0;
-}
+  display: none;  
+}  
   
-  #next-episode-overlay {
-  position: absolute;
-  bottom: 80px;
-  right: 30px;
-  z-index: 8000;
-
-  display: none;
-}
-
-.next-card {
-  background: rgba(0,0,0,0.85);
-  padding: 15px 20px;
-  border-radius: 12px;
-  border: 2px solid var(--accent-main);
-}
-
-.next-card button {
-  margin-top: 10px;
-  background: var(--accent-main);
-  border: none;
-  padding: 8px 12px;
-  font-weight: bold;
-  cursor: pointer;
-}
+.next-card {  
+  background: rgba(0,0,0,0.85);  
+  padding: 15px 20px;  
+  border-radius: 12px;  
+  border: 2px solid var(--accent-main);  
+}  
   
-  .volume-container {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-#volume-slider {
-  width: 70px;
-  accent-color: var(--accent-main);
-}
+.next-card button {  
+  margin-top: 10px;  
+  background: var(--accent-main);  
+  border: none;  
+  padding: 8px 12px;  
+  font-weight: bold;  
+  cursor: pointer;  
+}  
+    
+  .volume-container {  
+  display: flex;  
+  align-items: center;  
+  gap: 6px;  
+}  
   
-  #loading-screen {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: black;
-  z-index: 9999;
-
-  display: none;
-  justify-content: center;
-  align-items: center;
-}
-
-.loader {
-  border: 4px solid #333;
-  border-top: 4px solid var(--accent-main);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+#volume-slider {  
+  width: 70px;  
+  accent-color: var(--accent-main);  
+}  
+    
+  #loading-screen {  
+  position: absolute;  
+  width: 100%;  
+  height: 100%;  
+  background: black;  
+  z-index: 9998;  
   
-  #ad-controls {
-  position: absolute;
-  bottom: 30px;
-  left: 30px;
-  display: flex;
-  gap: 10px;
-  z-index: 9000;
-}
-
-#ad-controls button {
-  background: none;
-  border: none;
-  color: var(--accent-main);
-  font-size: 1.5rem;
-  cursor: pointer;
-}
+  display: none;  
+  justify-content: center;  
+  align-items: center;  
+}  
   
-  #end-screen {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: black;
-  z-index: 10000;
-
-  display: none;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.end-content h1 {
-  font-size: 2rem;
-  margin-bottom: 10px;
-}
-
-.end-buttons {
-  margin-top: 20px;
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-}
-
-.end-buttons button {
-  padding: 10px 16px;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-  border-radius: 8px;
-}
-
-.end-buttons button:first-child {
-  background: #333;
-  color: white;
-}
-
-.end-buttons button:last-child {
-  background: var(--accent-main);
-  color: black;
-}
+.loader {  
+  border: 4px solid #333;  
+  border-top: 4px solid var(--accent-main);  
+  border-radius: 50%;  
+  width: 40px;  
+  height: 40px;  
+  animation: spin 1s linear infinite;  
+}  
   
-  #skip-buttons {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-    z-index: 9000;
-}
-#skip-buttons.show {
-  opacity: 1;
-}
+@keyframes spin {  
+  to { transform: rotate(360deg); }  
+}  
+    
+  #ad-controls {  
+  position: absolute;  
+  bottom: 30px;  
+  left: 30px;  
+  display: flex;  
+  gap: 10px;  
+  z-index: 9000;  
+}  
   
-  #skip-buttons button {
-  background: rgba(0,0,0,0.8);
-  border: 2px solid var(--accent-main);
-  color: var(--accent-main);
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-weight: bold;
-}
+#ad-controls button {  
+  background: none;  
+  border: none;  
+  color: var(--accent-main);  
+  font-size: 1.5rem;  
+  cursor: pointer;  
+}  
+    
+  #end-screen {  
+  position: absolute;  
+  width: 100%;  
+  height: 100%;  
+  background: black;  
+  z-index: 10000;  
   
-  #caption-settings-menu {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
-  width: 90%;
-  max-width: 400px;
-  background: rgba(5,7,10,0.98);
-  padding: 50px 20px 25px;
-  border-radius: 20px;
-  border: 2px solid var(--accent-main);
-  z-index: 11000; /* Higher than the main settings */
-  flex-direction: column;
-  align-items: center;
-}
-
-.settings-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  width: 90%;
-}
-
-#caption-settings-close {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 1.8rem;
-  color: var(--accent-main);
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-  video::cue {
-  font-size: 16px;
-  color: white;
-  background: rgba(0,0,0,0.7);
-  padding: 4px 8px;
-  border-radius: 6px;
-}
-  </style>
-</head>
-<body>
-<div class="player-container" id="video-wrapper">
+  display: none;  
+  justify-content: center;  
+  align-items: center;  
+  text-align: center;  
+}  
   
-  <div id="loading-screen">
-  <div class="loader"></div>
-</div>
-
-  <div id="ad-overlay">
-    <div id="ad-content">
-      <video id="ad-video" playsinline preload="auto"></video>
-      <div id="ad-play-container">
-        <i class="fa-solid fa-play"></i>
-        <span>TAP TO WATCH AD</span>
-      </div>      
-      
-      <div id="ad-controls">
-  <button onclick="toggleAdPlay()"><i id="ad-play-icon" class="fa-solid fa-play"></i></button>
-  <button onclick="adFullScreen()"><i class="fa-solid fa-expand"></i></button>
-</div>
-      
-      <div id="ad-timer-container" style="display: none;">
-        <svg class="timer-svg" viewBox="0 0 80 80">
-          <circle class="timer-bg" cx="40" cy="40" r="35"></circle>
-          <circle id="timer-progress" cx="40" cy="40" r="35"></circle>
-        </svg>
-        <span id="ad-timer">-</span>
-      </div>
-    </div>
-  </div>
-
-  <video id="main-player" playsinline>
-    <track id="caption-track" kind="subtitles" srclang="en" src="https://nothingbuttylermovies.github.io/videos/captions/JennaAndTubers/JennaAndTubers_S1E1_Captions.vtt" default />
-  </video>
-
-  <div class="video-overlay-top" id="overlay-top">
-    <div style="display:flex; align-items:center; gap:20px;">
-      <a href="/info" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
-      <div class="episode-details">
-        <span id="mini-show-title">JENNA AND TUBERS</span>
-        <h1 id="large-episode-title">S1E1: The Visitor</h1>
-      </div>
-    </div>
-    <button onclick="toggleSettings()" id="settings-gear-btn"><i class="fa-solid fa-gear"></i></button>
-  </div>
+.end-content h1 {  
+  font-size: 2rem;  
+  margin-bottom: 10px;  
+}  
   
-  <div id="seek-preview" style="display:none; position:absolute; bottom:120px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.8); padding:10px 20px; border-radius:10px; border:2px solid var(--accent-main); z-index:9000; text-align:center;">
-  <span id="preview-time" style="font-size:1.5rem; font-weight:900; color:var(--accent-main);">0:00</span>
-  <div style="font-size:0.7rem; color:white; margin-top:5px;">Press PLAY to confirm</div>
-</div>
-
-
-  <div class="video-controls" id="controls">
-    <div class="progress-area" id="progress-bar-container"><div class="progress-filled" id="progress-fill"></div></div>
-    <div class="control-buttons">
-      <button onclick="togglePlay()"><i id="play-icon" class="fa-solid fa-play"></i></button>
-      <button onclick="seekBackward()"><i class="fa-solid fa-backward"></i></button>
-<button onclick="seekForward()"><i class="fa-solid fa-forward"></i></button>
-      <span id="time-display">0:00 / 0:00</span>
-      <div class="right-group">
+.end-buttons {  
+  margin-top: 20px;  
+  display: flex;  
+  gap: 15px;  
+  justify-content: center;  
+}  
+  
+.end-buttons button {  
+  padding: 10px 16px;  
+  font-weight: bold;  
+  border: none;  
+  cursor: pointer;  
+  border-radius: 8px;  
+}  
+  
+.end-buttons button:first-child {  
+  background: #333;  
+  color: white;  
+}  
+  
+.end-buttons button:last-child {  
+  background: var(--accent-main);  
+  color: black;  
+}  
+    
+  #skip-buttons {  
+  opacity: 0;  
+  transition: opacity 0.3s ease;  
+    z-index: 9000;  
+}  
+#skip-buttons.show {  
+  opacity: 1;  
+}  
+    
+  #skip-buttons button {  
+  background: rgba(0,0,0,0.8);  
+  border: 2px solid var(--accent-main);  
+  color: var(--accent-main);  
+  padding: 8px 12px;  
+  border-radius: 8px;  
+  font-weight: bold;  
+}  
+    
+  #caption-settings-menu {  
+  display: none;  
+  position: fixed;  
+  top: 50%;  
+  left: 50%;  
+  transform: translate(-50%,-50%);  
+  width: 90%;  
+  max-width: 400px;  
+  background: rgba(5,7,10,0.98);  
+  padding: 50px 20px 25px;  
+  border-radius: 20px;  
+  border: 2px solid var(--accent-main);  
+  z-index: 11000; /* Higher than the main settings */  
+  flex-direction: column;  
+  align-items: center;  
+}  
+  
+.settings-grid {  
+  display: grid;  
+  grid-template-columns: 1fr 1fr;  
+  gap: 10px;  
+  width: 90%;  
+}  
+  
+#caption-settings-close {  
+  position: absolute;  
+  top: 10px;  
+  right: 15px;  
+  font-size: 1.8rem;  
+  color: var(--accent-main);  
+  background: none;  
+  border: none;  
+  cursor: pointer;  
+}  
+  
+video::cue {  
+  font-size: var(--caption-size);  
+  color: var(--caption-color);  
+  background: var(--caption-bg);  
+  font-family: var(--caption-font);  
+  opacity: var(--caption-opacity);  
+  text-shadow: var(--caption-edge);  
+}  
+  
+#caption-settings-menu h2 {  
+  margin: 0 0 10px;  
+  text-align: center;  
+}  
+  
+/* LABELS */  
+#caption-settings-menu label {  
+  font-size: 0.85rem;  
+  opacity: 0.8;  
+}  
+  
+/* DROPDOWNS */  
+#caption-settings-menu select {  
+  width: 100%;  
+  padding: 10px;  
+  
+  border-radius: 10px;  
+  border: 2px solid var(--accent-main);  
+  
+  background: #000;  
+  color: var(--accent-main);  
+  
+  font-weight: bold;  
+  cursor: pointer;  
+  
+  box-shadow: 0 0 10px var(--accent-glow);  
+}  
+  
+/* SLIDERS */  
+#caption-settings-menu input[type="range"] {  
+  width: 100%;  
+  accent-color: var(--accent-main);  
+  cursor: pointer;  
+}  
+  
+/* COLOR PICKER (make it look like a button) */  
+#caption-settings-menu input[type="color"] {  
+  width: 100%;  
+  height: 40px;  
+  border: none;  
+  border-radius: 10px;  
+  cursor: pointer;  
+}  
+  
+/* BUTTON ROW */  
+.caption-buttons {  
+  display: flex;  
+  gap: 10px;  
+  margin-top: 10px;  
+}  
+  
+/* DONE BUTTON */  
+.caption-done {  
+  flex: 1;  
+  padding: 10px;  
+  
+  border-radius: 10px;  
+  border: none;  
+  
+  background: var(--accent-main);  
+  color: black;  
+  font-weight: bold;  
+  
+  cursor: pointer;  
+  transition: 0.2s;  
+}  
+  
+.caption-done:hover {  
+  transform: scale(1.05);  
+  box-shadow: 0 0 15px var(--accent-glow);  
+}  
+  
+/* RESET BUTTON */  
+.caption-reset {  
+  flex: 1;  
+  padding: 10px;  
+  
+  border-radius: 10px;  
+  border: 2px solid var(--accent-main);  
+  
+  background: transparent;  
+  color: var(--accent-main);  
+  font-weight: bold;  
+  
+  cursor: pointer;  
+  transition: 0.2s;  
+}  
+  
+.caption-reset:hover {  
+  background: var(--accent-main);  
+  color: black;  
+}  
+    
+#caption-preview-box {  
+  flex: 1;  
+  
+  background: black;  
+  border-radius: 12px;  
+  
+  display: flex;  
+  justify-content: center;  
+  align-items: center;  
+  
+  padding: 20px;  
+}  
+  
+#caption-preview-text {  
+  font-size: var(--caption-size);  
+  color: var(--caption-color);  
+  font-family: var(--caption-font);  
+  opacity: var(--caption-opacity);  
+  
+  background: var(--caption-bg);  
+  padding: 6px 10px;  
+  border-radius: 6px;  
+  
+  text-shadow: var(--caption-edge);  
+}  
+    
+  .caption-layout {  
+  display: flex;  
+  gap: 20px;  
+  width: 100%;  
+}  
+  
+/* LEFT SIDE */  
+.caption-controls {  
+  flex: 1;  
+  display: flex;  
+  flex-direction: column;  
+  gap: 10px;  
+  
+  max-height: 300px;  
+  overflow-y: auto;  
+  padding-right: 5px;  
+}  
+  
+/* RIGHT SIDE */  
+  
+  
+/* MAKE MENU BIGGER */  
+#caption-settings-menu {  
+  max-width: 700px; /* 👈 bigger like Disney+ */  
+}  
+    
+  @media (max-width: 768px) {  
+  .caption-layout {  
+    flex-direction: column;  
+  }  
+  
+    
+#caption-preview-box {  
+  background-image: url('https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExZWNieG84MHM5aXR5b3NqMGhramdiNGF2Y2Nodzd0Y2lkMTA2bXVweCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/qRaSzWg6s4XDPsn8V4/giphy.gif');  
+  background-position: center;  
+  background-size: cover;  
+  position: relative;  
+}  
+  
+#caption-preview-box::after {  
+  content: "";  
+  position: absolute;  
+  inset: 0;  
+  background: rgba(0,0,0,0.6);  
+}  
+  }  
+  </style>  
+</head>  
+<body oncontextmenu="return false;">  
+<div class="player-container" id="video-wrapper">  
+    
+  <div id="loading-screen">  
+  <div class="loader"></div>  
+</div>  
+  
+  <div id="ad-overlay">  
+    <div id="ad-content">  
+      <video id="ad-video" playsinline controlslist="nodownload nofullscreen noremoteplayback"></video>
+      <div id="ad-play-container">  
+        <i class="fa-solid fa-play"></i>  
+        <span>TAP TO WATCH AD</span>  
+      </div>        
         
-        <div class="volume-container">
-  <i class="fa-solid fa-volume-high"></i>
-  <input type="range" id="volume-slider" min="0" max="1" step="0.01">
-</div>
+      <div id="ad-controls">  
+  <button onclick="toggleAdPlay()"><i id="ad-play-icon" class="fa-solid fa-play"></i></button>  
+  <button onclick="adFullScreen()"><i class="fa-solid fa-expand"></i></button>  
+</div>  
         
-        <button onclick="toggleCaptions()"><i class="fa-solid fa-closed-captioning"></i></button>
-        <button onclick="togglePiP()"><i class="fa-solid fa-clone"></i></button>
-        <button onclick="goFullScreen()"><i class="fa-solid fa-expand"></i></button>
-      </div>
-    </div>
+      <div id="ad-timer-container" style="display: none;">  
+        <svg class="timer-svg" viewBox="0 0 80 80">  
+          <circle class="timer-bg" cx="40" cy="40" r="35"></circle>  
+          <circle id="timer-progress" cx="40" cy="40" r="35"></circle>  
+        </svg>  
+        <span id="ad-timer">-</span>  
+      </div>  
+    </div>  
+  </div>  
+  
+  <video id="main-player" playsinline>  
+    <track id="caption-track" kind="subtitles" srclang="en" src="https://nothingbuttylermovies.github.io/videos/captions/JennaAndTubers/JennaAndTubers_S1E1_Captions.vtt" default />  
+  </video>  
+  
+  <div class="video-overlay-top" id="overlay-top">  
+    <div style="display:flex; align-items:center; gap:20px;">  
+      <a href="/info" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>  
+      <div class="episode-details">  
+        <span id="mini-show-title">JENNA AND TUBERS</span>  
+        <h1 id="large-episode-title">S1E1: The Visitor</h1>  
+      </div>  
+    </div>  
+    <button onclick="toggleSettings()" id="settings-gear-btn"><i class="fa-solid fa-gear"></i></button>  
+  </div>  
+    
+  <div id="seek-preview" style="display:none; position:absolute; bottom:120px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.8); padding:10px 20px; border-radius:10px; border:2px solid var(--accent-main); z-index:9000; text-align:center;">  
+    <img id="preview-thumbnail" style="  
+  width:120px;  
+  height:70px;  
+  object-fit:cover;  
+  border-radius:6px;  
+  margin-bottom:6px;  
+  display:none;  
+">  
+  <span id="preview-time" style="font-size:1.5rem; font-weight:900; color:var(--accent-main);">0:00</span>  
+  <div style="font-size:0.7rem; color:white; margin-top:5px;">Press PLAY to confirm</div>  
+</div>  
+  
+  
+  <div class="video-controls" id="controls">  
+    <div class="progress-area" id="progress-bar-container"><div class="progress-filled" id="progress-fill"></div></div>  
+    <div class="control-buttons">  
+      <button onclick="togglePlay()"><i id="play-icon" class="fa-solid fa-play"></i></button>  
+      <button onclick="openSeekPreview('rewind')"><i class="fa-solid fa-backward"></i></button>  
+      <button onclick="openSeekPreview('forward')"><i class="fa-solid fa-forward"></i></button>  
+      <span id="time-display">0:00 / 0:00</span>  
+      <div class="right-group">  
+          
+        <div class="volume-container">  
+  <i id="volume-icon" class="fa-solid fa-volume-high"></i>  
+  <input type="range" id="volume-slider" min="0" max="1" step="0.01">  
+</div>  
+          
+        <button onclick="toggleCaptions()"><i class="fa-solid fa-closed-captioning"></i></button>  
+        <button onclick="togglePiP()"><i class="fa-solid fa-clone"></i></button>  
+        <button onclick="goFullScreen()"><i class="fa-solid fa-expand"></i></button>  
+      </div>  
+    </div>  
+  </div>  
+  
+</div>  
+    
+        <div id="skip-buttons" style="position:absolute; bottom:80px; left:20px; display:none; gap:10px;">  
+  <button onclick="skipIntro()">⏭ Skip Intro</button>  
+  <button onclick="skipRecap()">⏭ Skip Recap</button>  
+</div>  
+    
+<div id="end-screen">  
+  <div class="end-content">  
+    <h1>Next Episode</h1>  
+    <p>Continuing in <span id="end-countdown">10</span>s</p>  
+  
+    <div class="end-buttons">  
+      <button onclick="cancelEndScreen()">No thanks</button>  
+      <button onclick="goToNextEpisode()">Yes, continue</button>  
+    </div>  
+  </div>  
+</div>  
+  
+  <div id="resume-popup" style="
+  position:absolute;
+  bottom:100px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,0.9);
+  border:2px solid var(--accent-main);
+  padding:15px 20px;
+  border-radius:12px;
+  z-index:10000;
+  display:none;
+  text-align:center;
+">
+  <p id="resume-text">Resume from -:--?</p>
+  <div style="margin-top:10px; display:flex; gap:10px; justify-content:center;">
+    <button onclick="resumePlayback()">▶ Resume</button>
+    <button onclick="restartFromBeginning()">🔁 Start Over</button>
   </div>
-
 </div>
   
-        <div id="skip-buttons" style="position:absolute; bottom:80px; left:20px; display:none; gap:10px;">
-  <button onclick="skipIntro()">⏭ Skip Intro</button>
-  <button onclick="skipRecap()">⏭ Skip Recap</button>
-</div>
+<div id="settings-menu">  
+  <h3>Settings</h3>  
+  <button onclick="setTheme('blue')">Ice Blue</button>  
+  <button onclick="setTheme('red')">Ice Red</button>  
+  <button onclick="setTheme('green')">Ice Green</button>  
+  <button onclick="openCaptionSettings()">Caption Settings</button>  
+  <button onclick="restartVideo()">Restart Video</button>  
+  <center><button id="settings-close-btn" onclick="closeSettings()"><i class="fa-solid fa-xmark"></i></button></center>  
+</div>  
+    
+<div id="caption-settings-menu">  
+  <h2>Captions</h2>  
   
-<div id="end-screen">
-  <div class="end-content">
-    <h1>Next Episode</h1>
-    <p>Continuing in <span id="end-countdown">10</span>s</p>
-
-    <div class="end-buttons">
-      <button onclick="cancelEndScreen()">No thanks</button>
-      <button onclick="goToNextEpisode()">Yes, continue</button>
-    </div>
-  </div>
-</div>
-
-<div id="settings-menu">
-  <h3>Settings</h3>
-  <button onclick="setTheme('blue')">Ice Blue</button>
-  <button onclick="setTheme('red')">Ice Red</button>
-  <button onclick="setTheme('green')">Ice Green</button>
-  <button onclick="openCaptionSettings()">Caption Settings</button>
-  <button onclick="restartVideo()">Restart Video</button>
-  <center><button id="settings-close-btn" onclick="closeSettings()"><i class="fa-solid fa-xmark"></i></button></center>
-</div>
+  <div class="caption-layout">  
   
-  <div id="caption-settings-menu" style="display:none;">
-  <h3>Caption Settings</h3>
-  <div class="settings-grid">
-    <button onclick="changeCaptionFont()">Caption Font</button>
-    <button onclick="changeCaptionSize()">Caption Size</button>
-    <button onclick="changeCaptionBg()">Caption Background</button>
-    <button onclick="changeCaptionOpacity()">Caption Opacity</button>
-  </div>
-  <button onclick="toggleCaptions()" style="margin-top:10px; border-style:dashed;">On/Off Toggle</button>
-  <button id="caption-settings-close" onclick="closeCaptionSettings()"><i class="fa-solid fa-xmark"></i></button>
-</div>
+    <!-- LEFT SIDE (SETTINGS) -->  
+    <div class="caption-controls">  
+<label>Size</label>
+<input id="caption-size" type="range" min="12" max="40" value="22">
 
+<label>Color</label>
+<input id="caption-color" type="color" value="#ffffff">
 
+<label>Opacity</label>
+<input id="caption-opacity" type="range" min="0" max="1" step="0.1" value="1">
+
+<label>Background</label>
+<input id="caption-bg" type="color" value="#000000">
+
+<label>Background Opacity</label>
+<input id="caption-bg-opacity" type="range" min="0" max="1" step="0.1" value="0.7">
+
+<label>Font</label>
+<select id="caption-font">
+  <option value="Inter">Inter</option>
+  <option value="Arial">Arial</option>
+  <option value="Verdana">Verdana</option>
+</select>
+
+<label>Edge Style</label>
+<select id="caption-edge">
+  <option value="none">None</option>
+  <option value="shadow">Shadow</option>
+  <option value="outline">Outline</option>
+</select>
+    </div>  
+  
+    <!-- RIGHT SIDE (PREVIEW) -->  
+    <div id="caption-preview-box">  
+      <span id="caption-preview-text">  
+        This is how your captions on your show/movie will look like! Pretty sweet, right? ;)  
+      </span>  
+    </div>  
+  
+  </div>  
+  
+  <div class="caption-buttons">  
+    <button class="caption-reset" onclick="resetCaptions()">Reset</button>  
+    <button class="caption-done" onclick="closeCaptionSettings()">Done</button>  
+  </div>  
+</div>  
+  
+  
 <script>
+  
+  // ===============================
+// CONFIG
+// ===============================
 const AD_URL = "https://nothingbuttylermovies.github.io/videos/ads/lv_0_20260126153800%20(1)%20(1).mp4";
 const MOVIE_URL = "https://nothingbuttylermovies.github.io/videos/JennaAndTubers/Jenna%20and%20Tubers%20-%20Mini%20TV%20show%20-%20episode%201%20%23shortvideo%20%23roblox.mp4";
-const CIRCUMFERENCE = 220;
 
-/* ELEMENTS */
-const adOverlay = document.getElementById("ad-overlay");
-const adVideo = document.getElementById("ad-video");
-const adPlayContainer = document.getElementById("ad-play-container"); 
+// ===============================
+// ELEMENTS
+// ===============================
 const mainPlayer = document.getElementById("main-player");
-const timerContainer = document.getElementById("ad-timer-container");
-const timerText = document.getElementById("ad-timer");
-const timerProgress = document.getElementById("timer-progress");
+const adVideo = document.getElementById("ad-video");
+
+const adOverlay = document.getElementById("ad-overlay");
+const adPlayContainer = document.getElementById("ad-play-container");
+const adControls = document.getElementById("ad-controls");
+
 const controls = document.getElementById("controls");
 const overlayTop = document.getElementById("overlay-top");
-const progressContainer = document.getElementById("progress-bar-container");
+
 const progressFill = document.getElementById("progress-fill");
+const progressContainer = document.getElementById("progress-bar-container");
+
 const playIcon = document.getElementById("play-icon");
 const timeDisplay = document.getElementById("time-display");
+
+const volumeSlider = document.getElementById("volume-slider");
+const volumeIcon = document.getElementById("volume-icon");
+
 const settingsMenu = document.getElementById("settings-menu");
-  
-const nextOverlay = document.getElementById("next-episode-overlay");
-const countdownEl = document.getElementById("countdown");
-  
-  let adMode = "tap"; 
-// "tap" = waiting for user
-// "playing" = ad is playing
-// "ended" = ad finished
+const captionMenu = document.getElementById("caption-settings-menu");
 
-let nextTriggered = false;
-let nextCanceled = false;
-let countdownInterval = null;
+const skipButtons = document.getElementById("skip-buttons");
+const endScreen = document.getElementById("end-screen");
 
-/* STATE */
-let started = false;
+const timerText = document.getElementById("ad-timer");
+const timerProgress = document.getElementById("timer-progress");
+  
+const seekPreview = document.getElementById("seek-preview");
+const timerContainer = document.getElementById("ad-timer-container");
+const resumePopup = document.getElementById("resume-popup");
+const resumeText = document.getElementById("resume-text");
+
+// ===============================
+// STATE
+// ===============================
 let adFinished = false;
+let started = false;
 let controlsTimeout;
+let textTrack = null;
+let pendingResumeTime = 0;
+let endInterval = null;
 
-/* INIT */
+// ===============================
+// INIT
+// ===============================
+  // (window.load)
 window.addEventListener("load", () => {
   adOverlay.style.display = "flex";
 
-  const adControls = document.getElementById("ad-controls");
-
-  // ✅ Only tap is active
-  adControls.style.display = "none";
-  adControls.style.pointerEvents = "none";
-
+  // 👇 ONLY show tap UI at start
   adPlayContainer.style.display = "flex";
   adPlayContainer.style.pointerEvents = "auto";
 
-  adVideo.src = AD_URL;
-  mainPlayer.src = MOVIE_URL;
-
-  const savedTheme = localStorage.getItem("theme") || "blue";
-  setTheme(savedTheme);
-});
-
-/* 1. START PLAYBACK */
-function startPlayback() {
-  if (started) return;
-  started = true;
-
-  adMode = "playing";
-
-  // ❌ Disable tap UI completely
-  adPlayContainer.style.display = "none";
-  adPlayContainer.style.pointerEvents = "none";
-
-  // ✅ Enable ad controls
-  const adControls = document.getElementById("ad-controls");
-  adControls.style.display = "flex";
-  adControls.style.pointerEvents = "auto";
-
-  // Unlock main player
-  mainPlayer.play().then(() => {
-    mainPlayer.pause();
-  });
-
-  // Start ad
-  adVideo.style.opacity = "1";
-  adVideo.muted = false;
-
-  adVideo.play().then(() => {
-    timerContainer.style.display = "flex";
-  }).catch(() => {
-    adVideo.dispatchEvent(new Event("ended"));
-  });
-
-
-
-
-  // 3. Start the Ad
-  adVideo.style.opacity = "1";
-  adVideo.muted = false;
-
-  adVideo.play().then(() => {
-    timerContainer.style.display = "flex";
-  }).catch((err) => {
-    console.error("Ad blocked", err);
-    adVideo.dispatchEvent(new Event('ended'));
-  });
-}
-  
-  
-  
-  /* 2. LISTENERS & TIMER (MISSING PART) */
-adPlayContainer.addEventListener("click", () => {
-  hideAdTapUI();
-  startPlayback();
-});
-
-adVideo.addEventListener("timeupdate", () => {
-  if (!adVideo.duration) return;
-  const remaining = Math.ceil(adVideo.duration - adVideo.currentTime);
-  timerText.textContent = remaining;
-  const progress = adVideo.currentTime / adVideo.duration;
-  timerProgress.style.strokeDashoffset = CIRCUMFERENCE - progress * CIRCUMFERENCE;
-});
-  
-  const skipButtons = document.getElementById("skip-buttons");
-
-
-  // (Optional recap — currently none)
-  
-    
-
-// time update listener
-  
-  mainPlayer.addEventListener("timeupdate", () => {
-  if (!adFinished) return;
-
-  const t = mainPlayer.currentTime;
-
-  if (t >= INTRO_START && t <= INTRO_END) {
-    skipButtons.style.display = "flex";
-  } else {
-    skipButtons.style.display = "none";
-  }
-});
-
-  
-
-
-
-  // 🔥 HARD DISABLE EVERYTHING AD RELATED
-  adPlayContainer.style.display = "none";
-  adPlayContainer.style.pointerEvents = "none";
-
-  const adControls = document.getElementById("ad-controls");
   adControls.style.display = "none";
   adControls.style.pointerEvents = "none";
 
   timerContainer.style.display = "none";
 
-  mainPlayer.style.zIndex = "10";
-  mainPlayer.muted = false;
-  mainPlayer.currentTime = 0;
+  adVideo.src = AD_URL;
+  mainPlayer.src = MOVIE_URL;
+  
+  controls.style.display = "none";
+overlayTop.style.display = "none";
 
-  mainPlayer.play().then(() => {
-    showControls();
+  setupCaptionControls(); // 👈 ADD THIS
+  setTheme(localStorage.getItem("theme") || "blue");
+  setupVolume();
+});
+
+// ===============================
+// AD SYSTEM
+// ===============================
+adPlayContainer.addEventListener("click", startPlayback);
+
+function startPlayback() {
+  if (started) return;
+  started = true;
+
+  // ❌ hide tap UI
+  adPlayContainer.style.display = "none";
+  adPlayContainer.style.pointerEvents = "none";
+
+  // ✅ show controls AFTER click
+  adControls.style.display = "flex";
+  adControls.style.pointerEvents = "auto";
+
+  adVideo.muted = false;
+
+  adVideo.play().then(() => {
+    timerContainer.style.display = "flex"; // ✅ show timer
   });
-
-
-
-/* PLAYER CONTROLS */
-function togglePlay() { 
-  mainPlayer.paused ? mainPlayer.play() : mainPlayer.pause(); 
 }
 
-mainPlayer.addEventListener("play", () => { 
-  playIcon.className = "fa-solid fa-pause"; 
-  showControls(); 
-});
+function toggleAdPlay() {
+  const icon = document.getElementById("ad-play-icon");
+
+  if (adVideo.paused) {
+    adVideo.play();
+    icon.className = "fa-solid fa-pause";
+  } else {
+    adVideo.pause();
+    icon.className = "fa-solid fa-play";
+  }
+}
+
+function adFullScreen() {
+  if (!document.fullscreenElement) {
+    adOverlay.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
   
-  mainPlayer.addEventListener("play", () => {
-  nextEpisodeCancelled = false;
+  adVideo.addEventListener("play", () => {
+  document.getElementById("ad-play-icon").className = "fa-solid fa-pause";
 });
 
-mainPlayer.addEventListener("pause", () => { 
-  playIcon.className = "fa-solid fa-play"; 
-  showControls(); 
-});
-  
-mainPlayer.addEventListener("ended", () => {
-  showEndScreen();
+adVideo.addEventListener("pause", () => {
+  document.getElementById("ad-play-icon").className = "fa-solid fa-play";
 });
 
+adVideo.addEventListener("timeupdate", () => {
+  if (!adVideo.duration) return;
+
+  const remaining = Math.ceil(adVideo.duration - adVideo.currentTime);
+  timerText.textContent = remaining;
+
+  const progress = adVideo.currentTime / adVideo.duration;
+  timerProgress.style.strokeDashoffset = 220 - progress * 220;
+});
+
+adVideo.addEventListener("ended", endAd);
+
+function endAd() {
+  adFinished = true;
+
+  adOverlay.style.display = "none";
+
+  controls.style.display = "flex";
+  overlayTop.style.display = "flex";
+
+  mainPlayer.muted = true;
+
+  mainPlayer.load(); // 🔥 FORCE reload properly
+
+  mainPlayer.addEventListener("canplaythrough", () => {
+    mainPlayer.play().then(() => {
+      setTimeout(() => {
+        mainPlayer.muted = false;
+      }, 300);
+
+      showControls();
+    });
+  }, { once: true });
+}
+
+  
+
+// ===============================
+// MAIN PLAYER
+// ===============================
+function togglePlay() {
+  if (mainPlayer.paused) {
+    mainPlayer.play();
+  } else {
+    mainPlayer.pause();
+  }
+  setTimeout(updatePlayIcon, 50);
+}
+
+mainPlayer.addEventListener("play", () => {
+  playIcon.className = "fa-solid fa-pause";
+});
+
+mainPlayer.addEventListener("pause", () => {
+  playIcon.className = "fa-solid fa-play";
+});
+  
+  function updatePlayIcon() {
+  if (mainPlayer.paused) {
+    playIcon.className = "fa-solid fa-play";
+  } else {
+    playIcon.className = "fa-solid fa-pause";
+  }
+}
+  
+  let endCountdown = 10;
+
+function startEndCountdown() {
+  const label = document.getElementById("end-countdown");
+
+  endInterval = setInterval(() => {
+    endCountdown--;
+    label.textContent = endCountdown;
+
+    if (endCountdown <= 0) {
+      goToNextEpisode();
+    }
+  }, 1000);
+}
+
+function cancelEndScreen() {
+  clearInterval(endInterval);
+  endScreen.style.display = "none";
+}
+
+function goToNextEpisode() {
+  const nextEpisode = {
+    title: "S1E2: The Next Episode",
+    src: "https://github.com/NothingButTylerMovies/nothingbuttylermovies.github.io/raw/refs/heads/main/videos/JennaAndTubers/Jenna%20and%20Tubers%20-%20Mini%20TV%20show%20-%20episode%202%20%23shortvideo%20%23roblox.mp4"
+  };
+
+  // 🎬 Fade out (optional but clean)
+  mainPlayer.style.opacity = "0";
+
+  setTimeout(() => {
+    // 🔁 Swap video
+    mainPlayer.pause();
+    mainPlayer.src = nextEpisode.src;
+    mainPlayer.load();
+
+    // 📝 Update UI
+    document.getElementById("large-episode-title").textContent = nextEpisode.title;
+    
+    // Captions
+    document.getElementById("caption-track").src = "https://nothingbuttylermovies.github.io/videos/captions/JennaAndTubers/JennaAndTubers_S1E2.vtt";
+
+    // 🔄 Reset UI
+    progressFill.style.width = "0%";
+    timeDisplay.textContent = "0:00 / 0:00";
+    endScreen.style.display = "none";
+
+    // ▶️ Play next episode
+    mainPlayer.play();
+
+    // 🌐 Update URL (no reload)
+    history.pushState({}, "", "/watch?show=JennaAndTubers&s=1&e=2");
+
+    // 🎬 Fade back in
+    mainPlayer.style.opacity = "1";
+  }, 300);
+}
+  
+  mainPlayer.addEventListener("ended", () => {
+  endScreen.style.display = "flex";
+  endCountdown = 10;
+  document.getElementById("end-countdown").textContent = endCountdown;
+  startEndCountdown();
+});
+
+mainPlayer.addEventListener("play", updatePlayIcon);
+mainPlayer.addEventListener("pause", updatePlayIcon);
+
+// ===============================
+// FULLSCREEN
+// ===============================
+function goFullScreen() {
+  const wrapper = document.getElementById("video-wrapper");
+
+  if (!document.fullscreenElement) {
+    wrapper.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+// ===============================
+// PIP
+// ===============================
+async function togglePiP() {
+  if (!document.pictureInPictureEnabled) return;
+
+  if (document.pictureInPictureElement) {
+    await document.exitPictureInPicture();
+  } else {
+    await mainPlayer.requestPictureInPicture();
+  }
+}
+
+// ===============================
+// CONTROLS VISIBILITY
+// ===============================
 function showControls() {
-  if (!adFinished) return;
-
   controls.classList.add("active");
   overlayTop.classList.add("active");
 
   clearTimeout(controlsTimeout);
 
   controlsTimeout = setTimeout(() => {
-    if (!mainPlayer.paused && !settingsMenu.classList.contains("visible")) {
+    // ❌ DO NOT hide if paused
+    if (!mainPlayer.paused) {
       controls.classList.remove("active");
       overlayTop.classList.remove("active");
     }
   }, 3000);
 }
 
-function hideControls() {
-  if (settingsMenu.classList.contains("visible")) return;
-  controls.classList.remove("active");
-  overlayTop.classList.remove("active");
-}
+document.addEventListener("mousemove", showControls);
+document.addEventListener("touchstart", showControls);
 
-document.addEventListener("mousemove", () => {
-  if (!adFinished) return;
-  showControls();
+// ===============================
+// PROGRESS BAR
+// ===============================
+mainPlayer.addEventListener("timeupdate", () => {
+  if (!mainPlayer.duration) return;
+
+  const current = formatTime(mainPlayer.currentTime);
+  const total = formatTime(mainPlayer.duration);
+
+  timeDisplay.textContent = `${current} / ${total}`;
+
+  const percent = (mainPlayer.currentTime / mainPlayer.duration) * 100;
+  progressFill.style.width = percent + "%";
 });
 
-document.addEventListener("touchstart", () => {
-  if (!adFinished) return;
-  showControls();
+progressContainer.addEventListener("click", (e) => {
+  const rect = progressContainer.getBoundingClientRect();
+  const percent = (e.clientX - rect.left) / rect.width;
+
+  mainPlayer.currentTime = percent * mainPlayer.duration;
 });
 
-/* TIME + PROGRESS */
 function formatTime(sec) {
-  if (!sec || isNaN(sec)) return "0:00";
+  if (!sec) return "0:00";
   const m = Math.floor(sec / 60);
   const s = Math.floor(sec % 60);
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-mainPlayer.addEventListener("timeupdate", () => {
-  if (!mainPlayer.duration) return;
+// ===============================
+// SEEK (LEFT / RIGHT)
+// ===============================
+function openSeekPreview(direction) {
+  const wasPlaying = !mainPlayer.paused;
 
-  const percent = (mainPlayer.currentTime / mainPlayer.duration) * 100;
-  progressFill.style.width = percent + "%";
+  mainPlayer.pause(); // ✅ ALWAYS pause while seeking
 
-  timeDisplay.textContent =
-    `${formatTime(mainPlayer.currentTime)} / ${formatTime(mainPlayer.duration)}`;
-});
-
-progressContainer.addEventListener("click", e => {
-  const rect = progressContainer.getBoundingClientRect();
-  const percent = (e.clientX - rect.left) / rect.width;
-  mainPlayer.currentTime = percent * mainPlayer.duration;
-});
-
-/* SETTINGS */
-function toggleSettings() {
-  if (!adFinished) return; // Block settings during ad
-  settingsMenu.classList.toggle("visible");
-  
-  if (settingsMenu.classList.contains("visible")) {
-    clearTimeout(controlsTimeout);
-    controls.classList.add("active");
-    overlayTop.classList.add("active");
+  if (direction === "rewind") {
+    mainPlayer.currentTime = Math.max(0, mainPlayer.currentTime - 5);
   } else {
-    showControls();
+    mainPlayer.currentTime = Math.min(
+      mainPlayer.duration,
+      mainPlayer.currentTime + 5
+    );
   }
+
+  // ❌ DO NOT auto resume
+  // user must press play manually (like Netflix)
 }
+// ===============================
+// VOLUME
+// ===============================
+function setupVolume() {
+  let saved = localStorage.getItem("volume") || 1;
 
-function closeSettings() { 
-  settingsMenu.classList.remove("visible"); 
-  showControls();
-}
+  mainPlayer.volume = saved;
+  volumeSlider.value = saved;
 
-function setTheme(theme) {
-  document.body.classList.remove("theme-red", "theme-green");
-  if (theme === "red") document.body.classList.add("theme-red");
-  if (theme === "green") document.body.classList.add("theme-green");
-  localStorage.setItem("theme", theme);
-}
+  updateVolumeIcon(saved);
 
-function restartVideo() { 
-  mainPlayer.currentTime = 0; 
-  mainPlayer.play(); 
-  closeSettings();
-}
+  volumeSlider.addEventListener("input", () => {
+    mainPlayer.volume = volumeSlider.value;
+    updateVolumeIcon(volumeSlider.value);
+    localStorage.setItem("volume", volumeSlider.value);
+  });
 
-function goFullScreen() {
-  const wrapper = document.getElementById("video-wrapper");
-  if (!document.fullscreenElement) wrapper.requestFullscreen();
-  else document.exitFullscreen();
-}
-  
-  
-  // Next Episode Overlay
-  
-const endScreen = document.getElementById("end-screen");
-const endCountdownEl = document.getElementById("end-countdown");
-
-let endCountdown = 10;
-let endInterval = null;
-let endCancelled = false;
-  
-  /* Next screen */
-  
-  function showEndScreen() {
-  endScreen.style.display = "flex";
-  endCountdown = 10;
-  endCancelled = false;
-
-  endCountdownEl.textContent = endCountdown;
-
-  endInterval = setInterval(() => {
-    if (endCancelled) return;
-
-    endCountdown--;
-    endCountdownEl.textContent = endCountdown;
-
-    if (endCountdown <= 0) {
-      clearInterval(endInterval);
-      goToNextEpisode();
+  volumeIcon.addEventListener("click", () => {
+    if (mainPlayer.volume > 0) {
+      mainPlayer.dataset.prev = mainPlayer.volume;
+      mainPlayer.volume = 0;
+      volumeSlider.value = 0;
+    } else {
+      const prev = mainPlayer.dataset.prev || 1;
+      mainPlayer.volume = prev;
+      volumeSlider.value = prev;
     }
-  }, 1000);
-}
-  
-  /* Cancel Button */
-  
-  function cancelEndScreen() {
-  endCancelled = true;
-  clearInterval(endInterval);
 
-  endScreen.style.display = "none";
-
-  // 🔥 Turn play button into replay
-  playIcon.className = "fa-solid fa-rotate-left";
-
-  mainPlayer.currentTime = 0;
-}
-  
-  /* Continue button */
-  
-  function goToNextEpisode() {
-  const loading = document.getElementById("loading-screen");
-  loading.style.display = "flex";
-
-  setTimeout(() => {
-    window.location.href = "NEXT_EPISODE_URL_HERE";
-  }, 2000);
-}
-  
-  // Volume Slider
-  
-  const volumeSlider = document.getElementById("volume-slider");
-
-volumeSlider.value = 1;
-
-volumeSlider.addEventListener("input", () => {
-  mainPlayer.volume = volumeSlider.value;
-
-  localStorage.setItem("volume", volumeSlider.value);
-});
-  
-const savedVolume = localStorage.getItem("volume");
-
-if (savedVolume !== null) {
-  mainPlayer.volume = parseFloat(savedVolume);
-  volumeSlider.value = savedVolume;
-}
-  
-  // Save progress Script
-  
-  function saveProgress() {
-  localStorage.setItem("progress-" + MOVIE_URL, mainPlayer.currentTime);
+    updateVolumeIcon(mainPlayer.volume);
+  });
 }
 
-// Save during playback (throttled)
-let lastSave = 0;
-mainPlayer.addEventListener("timeupdate", () => {
-  const now = Date.now();
-  if (now - lastSave > 1000) {
-    saveProgress();
-    lastSave = now;
-  }
-});
+function updateVolumeIcon(vol) {
+  if (vol == 0) volumeIcon.className = "fa-solid fa-volume-xmark";
+  else if (vol < 0.5) volumeIcon.className = "fa-solid fa-volume-low";
+  else volumeIcon.className = "fa-solid fa-volume-high";
+}
 
-// Save when pausing
-mainPlayer.addEventListener("pause", saveProgress);
-
-// Save when leaving page
-window.addEventListener("beforeunload", saveProgress);
-  
-  mainPlayer.addEventListener("loadedmetadata", () => {
-  timeDisplay.textContent = `0:00 / ${formatTime(mainPlayer.duration)}`;
-
+// ===============================
+// CAPTIONS
+// ===============================
+function checkResume() {
   const savedTime = localStorage.getItem("progress-" + MOVIE_URL);
 
-  if (savedTime && parseFloat(savedTime) < mainPlayer.duration - 5) {
-    mainPlayer.currentTime = parseFloat(savedTime);
-  }
-});
-  
-  
-// Loading screen redirect to next episode
-  
+  if (
+    savedTime &&
+    mainPlayer.duration &&
+    savedTime < mainPlayer.duration - 5
+  ) {
+    pendingResumeTime = parseFloat(savedTime);
 
+    resumeText.textContent =
+      `Resume from ${formatTime(pendingResumeTime)}?`;
 
-mainPlayer.addEventListener("timeupdate", () => {
-  if (!adFinished) return; // 🚫 BLOCK during ads
-  if (!mainPlayer.duration) return;
-  if (mainPlayer.paused) return; // 🚫 BLOCK when paused
-
-  const timeLeft = mainPlayer.duration - mainPlayer.currentTime;
-
-  if (timeLeft <= 10 && !nextTriggered && !nextCanceled) {
-    startNextEpisodeCountdown();
-  }
-});
-
-
-
-function cancelNextEpisode() {
-  nextCanceled = true;
-  nextTriggered = true;
-
-  clearInterval(countdownInterval);
-  
-}
-
-function goToNextEpisode() {
-  const loading = document.getElementById("loading-screen");
-  loading.style.display = "flex";
-
-  setTimeout(() => {
-    window.location.href = "NEXT_EPISODE_URL_HERE";
-  }, 2000);
-}
-  
-  // Rewind/Fast Forwarding Script
-  
-  function seekBackward() {
-  mainPlayer.pause();
-  mainPlayer.currentTime = Math.max(0, mainPlayer.currentTime - 10);
-}
-
-function seekForward() {
-  mainPlayer.pause();
-  mainPlayer.currentTime = Math.min(mainPlayer.duration, mainPlayer.currentTime + 10);
-}
-  
-  // Ad Play & Fullscreen Controls for Ad Player
-  
-  
-  const adPlayIcon = document.getElementById("ad-play-icon");
-
-function toggleAdPlay() {
-  if (adVideo.paused) {
-    adVideo.play();
-  } else {
-    adVideo.pause();
+    resumePopup.style.display = "block";
   }
 }
 
-adVideo.addEventListener("play", () => {
-  adPlayIcon.className = "fa-solid fa-pause";
-});
-
-adVideo.addEventListener("pause", () => {
-  adPlayIcon.className = "fa-solid fa-play";
-});
-
-function adFullScreen() {
-  if (!document.fullscreenElement) {
-    adVideo.requestFullscreen();
-  } else {
-    document.exitFullscreen();
-  }
-}
-  
-  
-if (nextOverlay) {
-  nextOverlay.style.display = "none";
-}
-  
-  // other
-  
-  function hideAdTapUI() {
-  if (adPlayContainer) adPlayContainer.style.display = "none";
-}
-  
-  mainPlayer.addEventListener("pause", () => {
-  if (countdownInterval) {
-    clearInterval(countdownInterval);
-  }
-});
-
-mainPlayer.addEventListener("play", () => {
-  if (nextTriggered && !nextCanceled) {
-    startNextEpisodeCountdown(); // resume countdown
-  }
-});
-  
-  const adControlsEl = document.getElementById("ad-controls");
-
-if (adControlsEl) {
-  adControlsEl.style.pointerEvents = "auto";
-  adControlsEl.style.display = "none";
-}
-  
-  mainPlayer.addEventListener("play", () => {
-  if (mainPlayer.currentTime < 2) {
-    nextTriggered = false;
-    nextCanceled = false;
-    
-  }
-});
-  
-  adVideo.addEventListener("ended", () => {
-  adFinished = true;
-
-  adOverlay.style.display = "none";
-
-  adPlayContainer.style.display = "none";
-  adPlayContainer.style.pointerEvents = "none";
-
-  const adControls = document.getElementById("ad-controls");
-  adControls.style.display = "none";
-  adControls.style.pointerEvents = "none";
-
-  timerContainer.style.display = "none";
-
-  mainPlayer.style.zIndex = "10";
-  mainPlayer.muted = false;
-  mainPlayer.currentTime = 0;
-
-  mainPlayer.play().then(() => {
-    showControls();
-  });
-});
-  
-  // Skip Intro/Recap Logic
-  
-  const INTRO_START = 0;
-const INTRO_END = 3;
-
-const RECAP_START = 20;
-const RECAP_END = 40;
-  
-  // Skip Intro/Recap Functions
-  
-  function skipIntro() {
-  mainPlayer.currentTime = INTRO_END;
+function toggleCaptions() {
+  if (!textTrack) return;
+  textTrack.mode = textTrack.mode === "showing" ? "hidden" : "showing";
 }
 
-function skipRecap() {
-  mainPlayer.currentTime = RECAP_END;
-}
-  
-// Preview Seek Logic
-  
-  /* KEYBOARD CONTROLS & SEEK PREVIEW */
-const seekPreview = document.getElementById("seek-preview");
-const previewTimeDisplay = document.getElementById("preview-time");
-let isSeeking = false;
-let tempSeekTime = 0;
-
-document.addEventListener("keydown", (e) => {
-  if (!adFinished) return; // Block during ads
-
-  if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-    if (!isSeeking) {
-      isSeeking = true;
-      tempSeekTime = mainPlayer.currentTime;
-      mainPlayer.pause(); // Pause while they "scrub"
-      seekPreview.style.display = "block";
-    }
-
-    const step = 5; // seconds per tap
-    if (e.key === "ArrowLeft") tempSeekTime = Math.max(0, tempSeekTime - step);
-    if (e.key === "ArrowRight") tempSeekTime = Math.min(mainPlayer.duration, tempSeekTime + step);
-
-    previewTimeDisplay.textContent = formatTime(tempSeekTime);
-  }
-
-  if (e.key === " " || e.key === "Enter") {
-    if (isSeeking) {
-      mainPlayer.currentTime = tempSeekTime;
-      isSeeking = false;
-      seekPreview.style.display = "none";
-      mainPlayer.play();
-    } else {
-      togglePlay();
-    }
-  }
-});
-
-  // Captions Settings (Logic and Etc)
-  // 1. logic
-  
-  const captionMenu = document.getElementById("caption-settings-menu");
-
+// ===============================
+// CAPTION SETTINGS MENU
+// ===============================
 function openCaptionSettings() {
   settingsMenu.classList.remove("visible");
   captionMenu.style.display = "flex";
@@ -1050,90 +1137,117 @@ function closeCaptionSettings() {
   captionMenu.style.display = "none";
   settingsMenu.classList.add("visible");
 }
+  
+function setupCaptionControls() {
+  const size = document.getElementById("caption-size");
+  const color = document.getElementById("caption-color");
+  const opacity = document.getElementById("caption-opacity");
+  const bg = document.getElementById("caption-bg");
+  const bgOpacity = document.getElementById("caption-bg-opacity");
+  const font = document.getElementById("caption-font");
+  const edge = document.getElementById("caption-edge");
 
-// Quick placeholder functions for the new buttons
-  
-  
-// 2. Real Working Captions Settings
-  
-  // a. Font size Changer
-  
-  let captionSize = 16;
+  function apply() {
+    const bgColor = hexToRGBA(bg.value, bgOpacity.value);
 
-function changeCaptionSize() {
-  captionSize += 2;
-  if (captionSize > 28) captionSize = 14;
+    document.documentElement.style.setProperty("--caption-size", size.value + "px");
+    document.documentElement.style.setProperty("--caption-color", color.value);
+    document.documentElement.style.setProperty("--caption-opacity", opacity.value);
+    document.documentElement.style.setProperty("--caption-bg", bgColor);
+    document.documentElement.style.setProperty("--caption-font", font.value);
 
-  document.styleSheets[0].insertRule(`
-    video::cue {
-      font-size: ${captionSize}px;
-    }
-  `, document.styleSheets[0].cssRules.length);
-}
-  
-  // b. Background toggle
-  
-  let bgDark = true;
+    let edgeStyle = "none";
+    if (edge.value === "shadow") edgeStyle = "2px 2px 4px black";
+    if (edge.value === "outline") edgeStyle = "-1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black";
 
-function changeCaptionBg() {
-  bgDark = !bgDark;
+    document.documentElement.style.setProperty("--caption-edge", edgeStyle);
 
-  const bg = bgDark ? "rgba(0,0,0,0.7)" : "transparent";
-
-  document.styleSheets[0].insertRule(`
-    video::cue {
-      background: ${bg};
-    }
-  `, document.styleSheets[0].cssRules.length);
-}
-  
-  // c. Opacity control
-  
-  let opacity = 0.7;
-
-function changeCaptionOpacity() {
-  opacity -= 0.2;
-  if (opacity < 0.2) opacity = 1;
-
-  document.styleSheets[0].insertRule(`
-    video::cue {
-      background: rgba(0,0,0,${opacity});
-    }
-  `, document.styleSheets[0].cssRules.length);
-}
-  
-  // d. font Family switcher
-  
-  let fontIndex = 0;
-const fonts = ["Inter", "Arial", "Courier New"];
-
-function changeCaptionFont() {
-  fontIndex = (fontIndex + 1) % fonts.length;
-
-  document.styleSheets[0].insertRule(`
-    video::cue {
-      font-family: ${fonts[fontIndex]};
-    }
-  `, document.styleSheets[0].cssRules.length);
-}
-  
-  // e. save settings script
-  
-  localStorage.setItem("captionSize", captionSize);
-localStorage.setItem("captionFont", fonts[fontIndex]);
-
-  // 2. Script
-  
-  const track = document.getElementById("caption-track");
-const textTrack = mainPlayer.textTracks[0];
-  
-  function toggleCaptions() {
-  if (textTrack.mode === "showing") {
-    textTrack.mode = "hidden";
-  } else {
-    textTrack.mode = "showing";
+    // SAVE
+    localStorage.setItem("cap-size", size.value);
+    localStorage.setItem("cap-color", color.value);
+    localStorage.setItem("cap-opacity", opacity.value);
+    localStorage.setItem("cap-bg", bgColor);
+    localStorage.setItem("cap-font", font.value);
+    localStorage.setItem("cap-edge", edge.value);
   }
+
+  [size, color, opacity, bg, bgOpacity, font, edge].forEach(el => {
+    el.addEventListener("input", apply);
+  });
+
+  apply();
 }
+  
+  function hexToRGBA(hex, opacity) {
+  const r = parseInt(hex.substr(1,2),16);
+  const g = parseInt(hex.substr(3,2),16);
+  const b = parseInt(hex.substr(5,2),16);
+  return `rgba(${r},${g},${b},${opacity})`;
+}
+
+// ===============================
+// SETTINGS
+// ===============================
+function toggleSettings() {
+  settingsMenu.classList.toggle("visible");
+}
+
+function closeSettings() {
+  settingsMenu.classList.remove("visible");
+}
+
+// ===============================
+// THEMES
+// ===============================
+function setTheme(theme) {
+  document.body.className = "";
+
+  if (theme === "red") document.body.classList.add("theme-red");
+  if (theme === "green") document.body.classList.add("theme-green");
+
+  localStorage.setItem("theme", theme);
+}
+
+function loadTheme() {
+  const saved = localStorage.getItem("theme") || "blue";
+  setTheme(saved);
+}
+
+// ===============================
+// RESTART
+// ===============================
+function restartVideo() {
+  mainPlayer.currentTime = 0;
+  mainPlayer.play();
+}
+
+// ===============================
+// RESUME
+// ===============================
+function resumePlayback() {
+  mainPlayer.currentTime = pendingResumeTime;
+  resumePopup.style.display = "none";
+}
+
+function restartFromBeginning() {
+  mainPlayer.currentTime = 0;
+  document.getElementById("resume-popup").style.display = "none";
+}
+
+// ===============================
+// NEXT EPISODE
+// ===============================
+mainPlayer.addEventListener("loadedmetadata", () => {
+  textTrack = mainPlayer.textTracks[0];
+
+if (textTrack) {
+  textTrack.mode = "showing"; // 🔥 THIS LINE FIXES IT
+}
+
+  if (adFinished) checkResume();
+});
+  
+  
 </script>
 </body>
 </html>
