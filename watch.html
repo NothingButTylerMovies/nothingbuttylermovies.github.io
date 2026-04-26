@@ -3,7 +3,7 @@
 <head>  
   <meta charset="UTF-8">  
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">  
-  <title>Watch Jenna and Tubers: S1E1: The Visitor | NothingButTyler Movies</title>  
+  <title>Watch [Fetching...] | NothingButTyler Movies</title>  
   <script src="https://kit.fontawesome.com/eeb01edac2.js" crossorigin="anonymous"></script>  
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">  
   <style>  
@@ -517,6 +517,24 @@ video::cue {
   background: rgba(0,0,0,0.6);  
 }  
   }  
+  
+  .go-home-btn { 
+    border: 1px solid var(--ice-blue); 
+    padding: 8px 18px; 
+    border-radius: 4px; 
+   color: var(--ice-blue); 
+   font-size: 0.7rem;
+   font-weight: 800; 
+   text-transform: uppercase;
+   text-decoration: none;
+}
+
+.go-home-btn:hover { 
+background: var(--ice-blue); 
+color: var(--onyx); 
+box-shadow: var(--cinema-glow); 
+text-decoration: none;
+}
   </style>  
 </head>  
 <body oncontextmenu="return false;">  
@@ -707,7 +725,50 @@ video::cue {
 // CONFIG
 // ===============================
 const AD_URL = "https://nothingbuttylermovies.github.io/videos/ads/lv_0_20260126153800%20(1)%20(1).mp4";
-const MOVIE_URL = "https://nothingbuttylermovies.github.io/videos/JennaAndTubers/Jenna%20and%20Tubers%20-%20Mini%20TV%20show%20-%20episode%201%20%23shortvideo%20%23roblox.mp4";
+// const MOVIE_URL = "https://nothingbuttylermovies.github.io/videos/JennaAndTubers/Jenna%20and%20Tubers%20-%20Mini%20TV%20show%20-%20episode%201%20%23shortvideo%20%23roblox.mp4";
+
+const CONTENT = {
+  shows: {
+    JennaAndTubers: {
+      title: "Jenna and Tubers",
+      seasons: {
+        "1": {
+          "1": {
+            title: "The Visitor",
+            src: "https://nothingbuttylermovies.github.io/videos/JennaAndTubers/Jenna%20and%20Tubers%20-%20Mini%20TV%20show%20-%20episode%201%20%23shortvideo%20%23roblox.mp4"
+          },
+          "2": {
+            title: "The Date",
+            src: "https://nothingbuttylermovies.github.io/videos/JennaAndTubers/Jenna%20and%20Tubers%20-%20Mini%20TV%20show%20-%20episode%202%20%23shortvideo%20%23roblox.mp4"
+          }
+        }
+      }
+    }
+  },
+
+  movies: {
+    JennasEvilRevenge: {
+      title: "Jenna's Evil Revenge",
+      src: "MOVIE1_URL.mp4"
+    },
+    JennasEvilRevenge2: {
+      title: "Jenna's Evil Revenge 2",
+      src: "MOVIE2_URL.mp4"
+    },
+    JennasEvilRevenge3: {
+      title: "Jenna's Evil Revenge 3 (Part 1)",
+      src: "MOVIE3P1_URL.mp4"
+    },
+    JennasEvilRevenge3Pt2: {
+      title: "Jenna's Evil Revenge 3 (Part 2)",
+      src: "MOVIE3P2_URL.mp4"
+    },
+    JennasEvilRevenge3Pt3: {
+      title: "Jenna's Evil Revenge 3 (Part 3)",
+      src: "MOVIE3P3_URL.mp4"
+    }
+  }
+};
 
 // ===============================
 // ELEMENTS
@@ -760,6 +821,9 @@ let endInterval = null;
 // ===============================
   // (window.load)
 window.addEventListener("load", () => {
+  loadContent();
+  
+  
   adOverlay.style.display = "flex";
 
   // 👇 ONLY show tap UI at start
@@ -1246,6 +1310,119 @@ if (textTrack) {
 
   if (adFinished) checkResume();
 });
+  
+// ===============================
+// URL PARSES
+// ===============================
+  
+  // parse
+  
+  function getParams() {
+  const params = new URLSearchParams(window.location.search);
+
+  return {
+    show: params.get("show"),
+    season: params.get("s"),
+    episode: params.get("e"),
+    movie: params.get("movie")
+  };
+}
+  
+  // error screen
+  
+  function showError(message) {
+  setPageTitle("Watch Error");
+
+  document.body.innerHTML = `
+    <div style="
+      background:black;
+      color:white;
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      flex-direction:column;
+      font-family:sans-serif;
+    ">
+      <h1><i class="fa-solid fa-triangle-exclamation" style="color: rgb(255, 212, 59);"></i> Watch Error</h1>
+      <p>${message}</p>
+      <a href="/"><button class="go-home-btn">go back to NothingButTyler Movies</button></a>
+    </div>
+  `;
+}
+  
+  // load content
+  
+  function loadContent() {
+  const { show, season, episode, movie } = getParams();
+
+  // ❌ No params
+  if (!show && !movie) {
+    showError("No show or movie specified.");
+    return;
+  }
+
+  // 🎬 SHOW LOGIC
+  if (show) {
+    const showData = CONTENT.shows[show];
+
+    if (!showData) {
+      showError("Show not found.");
+      return;
+    }
+
+    const seasonData = showData.seasons[season];
+    if (!seasonData) {
+      showError("Season not found.");
+      return;
+    }
+
+    const epData = seasonData[episode];
+    if (!epData) {
+      showError("Episode not found.");
+      return;
+    }
+
+    // ✅ SET VIDEO
+    mainPlayer.src = epData.src;
+    setPageTitle(`Watch ${showData.title}: S${season}E${episode}: ${epData.title}`);
+
+    // ✅ UPDATE UI
+    document.getElementById("mini-show-title").textContent = showData.title;
+    document.getElementById("large-episode-title").textContent =
+      `S${season}E${episode}: ${epData.title}`;
+
+    return;
+  }
+
+  // 🎥 MOVIE LOGIC
+  if (movie) {
+    const movieData = CONTENT.movies[movie];
+
+    if (!movieData) {
+      showError("Movie not found.");
+      return;
+    }
+
+    mainPlayer.src = movieData.src;
+    setPageTitle(`Watch ${movieData.title}`);
+
+    document.getElementById("mini-show-title").textContent = "MOVIE";
+    document.getElementById("large-episode-title").textContent =
+      movieData.title;
+
+    return;
+  }
+}
+  
+  loadContent();
+  
+  // title change
+  
+  function setPageTitle(text) {
+  document.title = text + " | NothingButTyler Movies";
+}
+  
   
   
 </script>
