@@ -3,7 +3,7 @@
 <head>  
   <meta charset="UTF-8">  
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">  
-  <title>Watch [Fetching...] | NothingButTyler Movies</title>  
+  <title>Watch Loading... | NothingButTyler Movies</title>  
   <script src="https://kit.fontawesome.com/eeb01edac2.js" crossorigin="anonymous"></script>  
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">  
   <style>  
@@ -840,6 +840,8 @@ window.addEventListener("load", () => {
   
   controls.style.display = "none";
 overlayTop.style.display = "none";
+  controls.style.pointerEvents = "none";
+overlayTop.style.pointerEvents = "none";
 
   setupCaptionControls(); // 👈 ADD THIS
   setTheme(localStorage.getItem("theme") || "blue");
@@ -918,22 +920,21 @@ function endAd() {
   controls.style.display = "flex";
   overlayTop.style.display = "flex";
 
+  controls.style.pointerEvents = "auto";
+  overlayTop.style.pointerEvents = "auto";
+
+  // 🔥 DO NOT call load() again (this caused loop bug)
+
   mainPlayer.muted = true;
 
-  mainPlayer.load(); // 🔥 FORCE reload properly
+  mainPlayer.play().then(() => {
+    setTimeout(() => {
+      mainPlayer.muted = false;
+    }, 300);
 
-  mainPlayer.addEventListener("canplaythrough", () => {
-    mainPlayer.play().then(() => {
-      setTimeout(() => {
-        mainPlayer.muted = false;
-      }, 300);
-
-      showControls();
-    });
-  }, { once: true });
+    showControls();
+  });
 }
-
-  
 
 // ===============================
 // MAIN PLAYER
@@ -984,46 +985,48 @@ function cancelEndScreen() {
 }
 
 function goToNextEpisode() {
-  const nextEpisode = {
-    title: "S1E2: The Next Episode",
-    src: "https://github.com/NothingButTylerMovies/nothingbuttylermovies.github.io/raw/refs/heads/main/videos/JennaAndTubers/Jenna%20and%20Tubers%20-%20Mini%20TV%20show%20-%20episode%202%20%23shortvideo%20%23roblox.mp4"
-  };
+  const { show, season, episode } = getParams();
 
-  // 🎬 Fade out (optional but clean)
-  mainPlayer.style.opacity = "0";
+  // 🎯 If user is on Episode 2 → go home
+  if (show === "JennaAndTubers" && season === "1" && episode === "2") {
+    window.location.href = "/";
+    return;
+  }
 
-  setTimeout(() => {
-    // 🔁 Swap video
-    mainPlayer.pause();
-    mainPlayer.src = nextEpisode.src;
-    mainPlayer.load();
+  // 🎬 Otherwise go to next episode (Episode 1 → 2)
+  const nextEpisode = parseInt(episode) + 1;
 
-    // 📝 Update UI
-    document.getElementById("large-episode-title").textContent = nextEpisode.title;
-    
-    // Captions
-    document.getElementById("caption-track").src = "https://nothingbuttylermovies.github.io/videos/captions/JennaAndTubers/JennaAndTubers_S1E2.vtt";
+  // 🌐 Update URL (no reload feel)
+  history.pushState({}, "", `/watch?show=${show}&s=${season}&e=${nextEpisode}`);
 
-    // 🔄 Reset UI
-    progressFill.style.width = "0%";
-    timeDisplay.textContent = "0:00 / 0:00";
-    endScreen.style.display = "none";
+  // 🔁 Reload content dynamically
+  loadContent();
 
-    // ▶️ Play next episode
-    mainPlayer.play();
+  // ▶️ Restart player cleanly
+  mainPlayer.currentTime = 0;
+  mainPlayer.play();
 
-    // 🌐 Update URL (no reload)
-    history.pushState({}, "", "/watch?show=JennaAndTubers&s=1&e=2");
-
-    // 🎬 Fade back in
-    mainPlayer.style.opacity = "1";
-  }, 300);
+  endScreen.style.display = "none";
 }
   
   mainPlayer.addEventListener("ended", () => {
+  const { show, season, episode } = getParams();
+
   endScreen.style.display = "flex";
   endCountdown = 10;
   document.getElementById("end-countdown").textContent = endCountdown;
+
+  // 🎯 Change text if last episode
+  if (show === "JennaAndTubers" && season === "1" && episode === "2") {
+    document.querySelector(".end-content h1").textContent = "Back to Home";
+    document.querySelector(".end-content p").innerHTML =
+      `Returning in <span id="end-countdown">10</span>s`;
+  } else {
+    document.querySelector(".end-content h1").textContent = "Next Episode";
+    document.querySelector(".end-content p").innerHTML =
+      `Continuing in <span id="end-countdown">10</span>s`;
+  }
+
   startEndCountdown();
 });
 
