@@ -34,8 +34,17 @@
     video { width:100%; height:100%; object-fit:contain; position:absolute; top:0; left:0; }  
   
     /* AD OVERLAY */  
-    #ad-overlay { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:black; z-index:2000; justify-content:center; align-items:center; pointer-events:auto; }  
-    #ad-content { position:relative; width:100%; height:100%; display:flex; justify-content:center; align-items:center; }  
+    #ad-overlay {
+  position: fixed; /* 🔥 change from absolute → fixed */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+
+  z-index: 999999; /* 🔥 go nuclear */
+}   
+
+  #ad-content { position:relative; width:100%; height:100%; display:flex; justify-content:center; align-items:center; }  
   
     #ad-video {   
       width: 100%;   
@@ -535,6 +544,11 @@ color: var(--onyx);
 box-shadow: var(--cinema-glow); 
 text-decoration: none;
 }
+  
+  /* temporary */
+  .video-controls {
+  background: red !important;
+}
   </style>  
 </head>  
 <body oncontextmenu="return false;">  
@@ -842,6 +856,15 @@ window.addEventListener("load", () => {
 overlayTop.style.display = "none";
   controls.style.pointerEvents = "none";
 overlayTop.style.pointerEvents = "none";
+  
+  controls.classList.remove("active");
+overlayTop.classList.remove("active");
+
+controls.style.display = "none";
+overlayTop.style.display = "none";
+
+controls.style.pointerEvents = "none";
+overlayTop.style.pointerEvents = "none";
 
   setupCaptionControls(); // 👈 ADD THIS
   setTheme(localStorage.getItem("theme") || "blue");
@@ -922,6 +945,15 @@ function endAd() {
 
   controls.style.pointerEvents = "auto";
   overlayTop.style.pointerEvents = "auto";
+  
+  controls.style.display = "flex";
+overlayTop.style.display = "flex";
+
+controls.classList.add("active");
+overlayTop.classList.add("active");
+
+controls.style.pointerEvents = "auto";
+overlayTop.style.pointerEvents = "auto";
 
   // 🔥 DO NOT call load() again (this caused loop bug)
 
