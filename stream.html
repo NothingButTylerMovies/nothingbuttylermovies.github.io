@@ -7,114 +7,43 @@
     <script src="https://kit.fontawesome.com/eeb01edac2.js" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     
+      <link rel="stylesheet" href="styles.css">
 <style>
-    :root {
-        --ice-blue: #38bdf8;
-        --onyx-black: #05070a;
-        --nbt-glass: rgba(255, 255, 255, 0.05);
-        --text-main: #f9f9f9;
-    }
 
-    body { 
-        margin: 0; font-family: 'Inter', sans-serif; 
-        background: var(--onyx-black); color: var(--text-main); 
-        overflow-x: hidden;
-    }
-
-    .backdrop {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-        background: linear-gradient(to right, var(--onyx-black) 30%, transparent 80%),
-                    linear-gradient(to top, var(--onyx-black) 10%, transparent 40%),
-                    url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=2070') center/cover;
-        z-index: -1;
-    }
-
-    /* DESKTOP LAYOUT */
-    .app-container {
-        display: flex; flex-direction: row;
-        min-height: 100vh; width: 100%;
-        padding: 80px 8%; box-sizing: border-box; gap: 50px;
-    }
-
-    .side-info { flex: 1; position: sticky; top: 100px; height: fit-content; }
-    .episode-area { flex: 1.5; }
-
-    /* TEXT & BUTTONS */
-    #display-tag { color: var(--ice-blue); font-weight: 800; letter-spacing: 2px; text-transform: uppercase; font-size: 0.8rem; }
-    #display-title { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 900; margin: 15px 0; line-height: 1; text-transform: uppercase; }
-    #display-desc { opacity: 0.8; line-height: 1.6; font-size: 1.05rem; margin-bottom: 30px; }
-
-    .btn-primary {
-        background: var(--ice-blue); color: var(--onyx-black);
-        border: none; padding: 18px 45px; border-radius: 8px;
-        font-weight: 900; text-transform: uppercase; cursor: pointer;
-        display: flex; align-items: center; gap: 12px; width: fit-content;
-    }
-
-    /* EPISODE SECTION */
-    .episode-header {
-        display: flex; justify-content: space-between; align-items: center;
-        border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 30px; padding-bottom: 10px;
-    }
-
-    .season-select {
-        background: var(--nbt-glass); color: white;
-        border: 1px solid rgba(255,255,255,0.2); padding: 10px 15px;
-        border-radius: 6px; font-weight: 700; cursor: pointer;
-    }
-
-    .ep-card {
-        display: grid; grid-template-columns: 200px 1fr; gap: 20px;
-        background: var(--nbt-glass); border: 1px solid rgba(255, 255, 255, 0.05);
-        padding: 15px; border-radius: 12px; margin-bottom: 20px;
-    }
-
-    .ep-thumb { width: 100%; aspect-ratio: 16/9; background: #111; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--ice-blue); }
-
-    /* 📱 THE MOBILE OVERRIDE - THE IMPORTANT PART */
-    @media (max-width: 900px) {
-        .app-container { 
-            flex-direction: column !important; /* Force vertical stack */
-            padding: 100px 20px;
-        }
-
-        .side-info, .episode-area { 
-            flex: none !important; 
-            width: 100% !important; /* Force full width */
-            position: relative; top: 0;
-        }
-
-        .btn-primary { width: 100%; justify-content: center; }
-
-        .episode-header {
-            flex-direction: column; align-items: stretch; gap: 10px;
-        }
-
-        .season-select { width: 100% !important; display: block; }
-
-        .ep-card { 
-            grid-template-columns: 1fr; /* Stack thumb over text */
-            width: 100%; box-sizing: border-box;
-        }
-    }
 </style>
 
 
 </head>
 
 <body>
+  
+  <nav>
+    <div class="nav-container">
+        <a href="/" class="nav-brand">
+            <i class="fa-solid fa-clapperboard"></i> NOTHINGBUTTYLER MOVIES
+        </a>
+        <div class="nav-links">
+            <a href="movies.html" class="nav-link">Movies</a>
+            <a href="/series" class="nav-link">Series</a>
+            <a href="/ytps" class="nav-link">YTP's</a>
+            <a href="https://nothingbuttyler.github.io/" class="btn-main-site">Back to the Peak</a>
+        </div>
+    </div>
+</nav>
+
+
     <div class="backdrop"></div>
 
     <div class="app-container">
         <div class="side-info">
-            <span id="display-tag">NBT ORIGINALS</span>
-            <h1 id="display-title">FETCHING</h1>
+            <span id="display-tag">GETTING DISPLAY TAG...</span>
+            <h1 id="display-title">FETCHING DISPLAY TITLE...</h1>
             <div id="display-desc">Loading series information...</div>
             
             <div class="controls">
-                <button class="btn-primary" id="main-action-btn">
-                    <i class="fa-solid fa-play"></i> STREAM PREMIERE
-                </button>
+                <a id="main-action-btn" class="btn-primary" href="#">
+    <i class="fa-solid fa-play"></i> STREAM PREMIERE
+</a>
             </div>
         </div>
 
@@ -131,99 +60,13 @@
         </div>
     </div>
 
-<script>
-    const fakeInfoTxt = `
-Name: Jenna and Tubers
-Tag: NBT Original Series
-Year: 2023
-Duration: 2 Seasons
-Description: An early look at my Roblox film journey. 
-Episodes: Episode 1|The start.;Episode 2|The middle.
-Episodes_S2: Episode 3|The return.;Episode 4|The finale.
 
-Name: JER 3
-Tag: NBT Original Movie
-Year: 2025
-...
-`;
+    <footer style="padding: 60px 20px; text-align: center; border-top: 1px solid var(--glass-border); opacity: 0.5; font-size: 0.7rem; letter-spacing: 2px;">
+        NOTHINGBUTTYLER MOVIES &copy; 2026 | THE RIDGELINE STUDIO
+    </footer>
 
-    const params = new URLSearchParams(window.location.search);
-    const urlName = params.get('show')?.replace(/_/g, " ").toLowerCase() || "jenna and tubers";
-
-    const blocks = fakeInfoTxt.trim().split('\n\n');
-    let foundBlock = null;
-
-    blocks.forEach(block => {
-        const lines = block.split('\n');
-        const nameLine = lines.find(l => l.startsWith('Name:'));
-        if (nameLine && nameLine.toLowerCase().includes(urlName)) {
-            foundBlock = lines;
-        }
-    });
-
-    if (foundBlock) {
-        const getValue = (key) => foundBlock.find(l => l.startsWith(key))?.split(': ')[1] || "";
-
-        document.getElementById('display-title').innerText = getValue('Name:');
-        document.getElementById('display-tag').innerText = getValue('Tag:');
-        document.getElementById('display-desc').innerText = getValue('Description:');
-        
-        // Load Season 1 by default
-        renderEpisodes(getValue('Episodes:'));
-
-        // Smart Toggle Logic
-        const hasS2 = foundBlock.find(l => l.startsWith('Episodes_S2:'));
-        if (hasS2) {
-            const wrapper = document.getElementById('season-wrapper');
-            const picker = document.getElementById('season-picker');
-            wrapper.style.display = "block";
-            if (picker.options.length < 2) {
-                let opt = document.createElement('option');
-                opt.value = "2";
-                opt.innerHTML = "Season 2";
-                picker.appendChild(opt);
-            }
-        }
-    } else {
-        document.getElementById('display-title').innerText = "Show Not Found";
-    }
-
-function renderEpisodes(data) {
-    const epList = document.getElementById('episode-list');
-    if (!data) return;
-
-    // Get the current show name from the URL to pass it to the next page
-    const params = new URLSearchParams(window.location.search);
-    const showID = params.get('show') || "JennaAndTubers";
-    const currentSeason = document.getElementById('season-picker').value || "1";
-
-    const episodes = data.split(';');
-    epList.innerHTML = episodes.map((ep, index) => {
-        const [title, desc] = ep.split('|');
-        const episodeNum = index + 1;
-
-        // Creating the link: watch.html?show=Name&s=1&e=1
-        const watchLink = `watch?show=${showID}&s=${currentSeason}&e=${episodeNum}`;
-
-        return `
-            <a href="${watchLink}" style="text-decoration: none; color: inherit;">
-                <div class="ep-card">
-                    <div class="ep-thumb"><i class="fa-solid fa-play"></i></div>
-                    <div class="ep-details">
-                        <h3>${episodeNum}. ${title}</h3>
-                        <p>${desc}</p>
-                    </div>
-                </div>
-            </a>`;
-    }).join('');
-}
-
-
-    document.getElementById('season-picker').addEventListener('change', (e) => {
-        const key = e.target.value === "1" ? "Episodes:" : `Episodes_S${e.target.value}:`;
-        const data = foundBlock.find(l => l.startsWith(key))?.split(': ')[1] || "";
-        renderEpisodes(data);
-    });
+<script src="script.js">
+ 
 </script>
 </body>
 </html>
