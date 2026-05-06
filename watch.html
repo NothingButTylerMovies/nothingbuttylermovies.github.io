@@ -836,39 +836,15 @@ let endInterval = null;
   // (window.load)
 window.addEventListener("load", () => {
   loadContent();
-  
-  
+
+  const adPlayContainer = document.getElementById("ad-play-container");
+
+  if (adPlayContainer) {
+    adPlayContainer.addEventListener("click", startPlayback);
+  }
+
   adOverlay.style.display = "flex";
-
-  // 👇 ONLY show tap UI at start
-  adPlayContainer.style.display = "flex";
-  adPlayContainer.style.pointerEvents = "auto";
-
-  adControls.style.display = "none";
-  adControls.style.pointerEvents = "none";
-
-  timerContainer.style.display = "none";
-
-  adVideo.src = AD_URL;
-  mainPlayer.src = MOVIE_URL;
   
-  controls.style.display = "none";
-overlayTop.style.display = "none";
-  controls.style.pointerEvents = "none";
-overlayTop.style.pointerEvents = "none";
-  
-  controls.classList.remove("active");
-overlayTop.classList.remove("active");
-
-controls.style.display = "none";
-overlayTop.style.display = "none";
-
-controls.style.pointerEvents = "none";
-overlayTop.style.pointerEvents = "none";
-
-  setupCaptionControls(); // 👈 ADD THIS
-  setTheme(localStorage.getItem("theme") || "blue");
-  setupVolume();
 });
 
 // ===============================
@@ -1118,20 +1094,17 @@ document.addEventListener("touchstart", showControls);
 mainPlayer.addEventListener("timeupdate", () => {
   if (!mainPlayer.duration) return;
 
-  const current = formatTime(mainPlayer.currentTime);
-  const total = formatTime(mainPlayer.duration);
+  const { show, season, episode, movie } = getParams();
 
-  timeDisplay.textContent = `${current} / ${total}`;
+  let id = "";
 
-  const percent = (mainPlayer.currentTime / mainPlayer.duration) * 100;
-  progressFill.style.width = percent + "%";
-});
+  if (show) {
+    id = `${show}-S${season}E${episode}`;
+  } else if (movie) {
+    id = movie;
+  }
 
-progressContainer.addEventListener("click", (e) => {
-  const rect = progressContainer.getBoundingClientRect();
-  const percent = (e.clientX - rect.left) / rect.width;
-
-  mainPlayer.currentTime = percent * mainPlayer.duration;
+  localStorage.setItem("progress-" + id, mainPlayer.currentTime);
 });
 
 function formatTime(sec) {
@@ -1203,7 +1176,18 @@ function updateVolumeIcon(vol) {
 // CAPTIONS
 // ===============================
 function checkResume() {
-  const savedTime = localStorage.getItem("progress-" + MOVIE_URL);
+  const { show, season, episode, movie } = getParams();
+
+  // 🔑 Create a UNIQUE ID per video
+  let id = "";
+
+  if (show) {
+    id = `${show}-S${season}E${episode}`;
+  } else if (movie) {
+    id = movie;
+  }
+
+  const savedTime = localStorage.getItem("progress-" + id);
 
   if (
     savedTime &&
