@@ -74,14 +74,14 @@
       font-weight: 700;  
       font-size: 1rem;  
       cursor: pointer;  
-      z-index: 9000;  
+      z-index: 10000;  
     }  
     #ad-play-container i { font-size: 1.6rem; }  
     #ad-play-container:hover { transform: scale(1.05); }  
   
     /* CONTROLS */  
     .player-container { width:100vw; height:100svh; position:relative; overflow:hidden; background:#000; }  
-    .video-controls, .video-overlay-top { position:absolute; width:100%; box-sizing:border-box; display:flex; flex-direction:column; gap:10px; opacity:0; pointer-events:none; transition:opacity 0.25s ease; z-index:9999; }  
+    .video-controls, .video-overlay-top { position:absolute; width:100%; box-sizing:border-box; display:flex; flex-direction:column; gap:10px; opacity:0; pointer-events:none; transition:opacity 0.25s ease; z-index:9999; display: none; }  
     .video-controls.active, .video-overlay-top.active { opacity:1; pointer-events:auto; }  
   
     .video-overlay-top { top:0; flex-direction:row; justify-content:/*flex-start*/ space-between; gap:20px; padding:10px; align-items: center; }  
@@ -545,10 +545,7 @@ box-shadow: var(--cinema-glow);
 text-decoration: none;
 }
   
-  /* temporary */
-  .video-controls {
-  background: red !important;
-}
+
   </style>  
 </head>  
 <body oncontextmenu="return false;">  
@@ -1448,4 +1445,4 @@ if (textTrack) {
   
 </body>
   
-  </html>
+</html>
