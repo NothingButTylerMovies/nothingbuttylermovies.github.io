@@ -81,7 +81,21 @@
   
     /* CONTROLS */  
     .player-container { width:100vw; height:100svh; position:relative; overflow:hidden; background:#000; }  
-    .video-controls, .video-overlay-top { position:absolute; width:100%; box-sizing:border-box; display:flex; flex-direction:column; gap:10px; opacity:0; pointer-events:none; transition:opacity 0.25s ease; z-index:9999; display: none; }  
+.video-controls, .video-overlay-top {
+  position:absolute;
+  width:100%;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+
+  opacity:0;
+  pointer-events:none;
+
+  transition:opacity 0.25s ease;
+  z-index:9999;
+}
+  
     .video-controls.active, .video-overlay-top.active { opacity:1; pointer-events:auto; }  
   
     .video-overlay-top { top:0; flex-direction:row; justify-content:/*flex-start*/ space-between; gap:20px; padding:10px; align-items: center; }  
@@ -738,6 +752,9 @@ text-decoration: none;
 const AD_URL = "https://nothingbuttylermovies.github.io/videos/ads/lv_0_20260126153800%20(1)%20(1).mp4";
 // const MOVIE_URL = "https://nothingbuttylermovies.github.io/videos/JennaAndTubers/Jenna%20and%20Tubers%20-%20Mini%20TV%20show%20-%20episode%201%20%23shortvideo%20%23roblox.mp4";
 
+  adVideo.src = AD_URL;
+  
+  
 const CONTENT = {
   shows: {
     JennaAndTubers: {
@@ -898,6 +915,14 @@ adVideo.addEventListener("pause", () => {
 
 adVideo.addEventListener("timeupdate", () => {
   if (!adVideo.duration) return;
+  
+  const percent =
+  (mainPlayer.currentTime / mainPlayer.duration) * 100;
+
+progressFill.style.width = percent + "%";
+
+timeDisplay.textContent =
+  `${formatTime(mainPlayer.currentTime)} / ${formatTime(mainPlayer.duration)}`;
 
   const remaining = Math.ceil(adVideo.duration - adVideo.currentTime);
   timerText.textContent = remaining;
@@ -919,8 +944,7 @@ function endAd() {
   controls.style.pointerEvents = "auto";
   overlayTop.style.pointerEvents = "auto";
   
-  controls.style.display = "flex";
-overlayTop.style.display = "flex";
+  
 
 controls.classList.add("active");
 overlayTop.classList.add("active");
@@ -1004,8 +1028,7 @@ function goToNextEpisode() {
   // 🌐 Update URL (no reload feel)
   history.pushState({}, "", `/watch?show=${show}&s=${season}&e=${nextEpisode}`);
 
-  // 🔁 Reload content dynamically
-  loadContent();
+
 
   // ▶️ Restart player cleanly
   mainPlayer.currentTime = 0;
@@ -1307,6 +1330,7 @@ function restartVideo() {
 function resumePlayback() {
   mainPlayer.currentTime = pendingResumeTime;
   resumePopup.style.display = "none";
+  mainPlayer.play();
 }
 
 function restartFromBeginning() {
@@ -1431,7 +1455,7 @@ if (textTrack) {
   }
 }
   
-  loadContent();
+  
   
   // title change
   
