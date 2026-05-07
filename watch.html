@@ -256,10 +256,14 @@
   #ad-controls {  
   position: absolute;  
   bottom: 30px;  
-  left: 30px;  
-  display: flex;  
+  left: 30px;
+
+  display: none; /* 🔥 hidden initially */
+
   gap: 10px;  
-  z-index: 9000;  
+  z-index: 9000;
+
+  pointer-events: none;
 }  
   
 #ad-controls button {  
@@ -881,7 +885,10 @@ function startPlayback() {
   adVideo.muted = false;
 
   adVideo.play().then(() => {
-    timerContainer.style.display = "flex"; // ✅ show timer
+  timerContainer.style.display = "flex";
+}).catch(err => {
+  console.log("Ad play blocked:", err);
+});
   });
 }
 
@@ -916,13 +923,7 @@ adVideo.addEventListener("pause", () => {
 adVideo.addEventListener("timeupdate", () => {
   if (!adVideo.duration) return;
   
-  const percent =
-  (mainPlayer.currentTime / mainPlayer.duration) * 100;
-
-progressFill.style.width = percent + "%";
-
-timeDisplay.textContent =
-  `${formatTime(mainPlayer.currentTime)} / ${formatTime(mainPlayer.duration)}`;
+  
 
   const remaining = Math.ceil(adVideo.duration - adVideo.currentTime);
   timerText.textContent = remaining;
@@ -1113,6 +1114,14 @@ document.addEventListener("touchstart", showControls);
 // ===============================
 mainPlayer.addEventListener("timeupdate", () => {
   if (!mainPlayer.duration) return;
+  
+  const percent =
+  (mainPlayer.currentTime / mainPlayer.duration) * 100;
+
+progressFill.style.width = percent + "%";
+
+timeDisplay.textContent =
+  `${formatTime(mainPlayer.currentTime)} / ${formatTime(mainPlayer.duration)}`;
 
   const { show, season, episode, movie } = getParams();
 
