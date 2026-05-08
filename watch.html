@@ -3,7 +3,7 @@
 <head>  
   <meta charset="UTF-8">  
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">  
-  <title>Watch {Loading...} | NothingButTyler Movies</title>  
+  <title>Watch Loading... | NothingButTyler Movies</title>  
   <script src="https://kit.fontawesome.com/eeb01edac2.js" crossorigin="anonymous"></script>  
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">  
   <style>  
@@ -563,7 +563,10 @@ box-shadow: var(--cinema-glow);
 text-decoration: none;
 }
   
-
+#volume-slider {
+  transition: all 0.2s ease;
+}
+  
   </style>  
 </head>  
 <body oncontextmenu="return false;">  
@@ -756,7 +759,7 @@ text-decoration: none;
 const AD_URL = "https://nothingbuttylermovies.github.io/videos/ads/lv_0_20260126153800%20(1)%20(1).mp4";
 // const MOVIE_URL = "https://nothingbuttylermovies.github.io/videos/JennaAndTubers/Jenna%20and%20Tubers%20-%20Mini%20TV%20show%20-%20episode%201%20%23shortvideo%20%23roblox.mp4";
 
-  adVideo.src = AD_URL;
+  
   
   
 const CONTENT = {
@@ -837,6 +840,8 @@ const seekPreview = document.getElementById("seek-preview");
 const timerContainer = document.getElementById("ad-timer-container");
 const resumePopup = document.getElementById("resume-popup");
 const resumeText = document.getElementById("resume-text");
+  
+  adVideo.src = AD_URL;
 
 // ===============================
 // STATE
@@ -853,7 +858,10 @@ let endInterval = null;
 // ===============================
   // (window.load)
 window.addEventListener("load", () => {
-  loadContent();
+  const loaded = loadContent();
+
+  // ❌ stop if invalid page
+  if (loaded === false) return;
 
   const adPlayContainer = document.getElementById("ad-play-container");
 
@@ -862,33 +870,31 @@ window.addEventListener("load", () => {
   }
 
   adOverlay.style.display = "flex";
-  
 });
 
 // ===============================
 // AD SYSTEM
 // ===============================
-adPlayContainer.addEventListener("click", startPlayback);
+
 
 function startPlayback() {
   if (started) return;
   started = true;
 
-  // ❌ hide tap UI
+  // hide tap UI
   adPlayContainer.style.display = "none";
   adPlayContainer.style.pointerEvents = "none";
 
-  // ✅ show controls AFTER click
+  // show controls after click
   adControls.style.display = "flex";
   adControls.style.pointerEvents = "auto";
 
   adVideo.muted = false;
 
   adVideo.play().then(() => {
-  timerContainer.style.display = "flex";
-}).catch(err => {
-  console.log("Ad play blocked:", err);
-});
+    timerContainer.style.display = "flex";
+  }).catch(err => {
+    console.log("Ad play blocked:", err);
   });
 }
 
@@ -906,9 +912,9 @@ function toggleAdPlay() {
 
 function adFullScreen() {
   if (!document.fullscreenElement) {
-    adOverlay.requestFullscreen();
+    adOverlay.requestFullscreen?.();
   } else {
-    document.exitFullscreen();
+    document.exitFullscreen?.();
   }
 }
   
@@ -922,14 +928,18 @@ adVideo.addEventListener("pause", () => {
 
 adVideo.addEventListener("timeupdate", () => {
   if (!adVideo.duration) return;
-  
-  
 
-  const remaining = Math.ceil(adVideo.duration - adVideo.currentTime);
+  const remaining = Math.ceil(
+    adVideo.duration - adVideo.currentTime
+  );
+
   timerText.textContent = remaining;
 
-  const progress = adVideo.currentTime / adVideo.duration;
-  timerProgress.style.strokeDashoffset = 220 - progress * 220;
+  const progress =
+    adVideo.currentTime / adVideo.duration;
+
+  timerProgress.style.strokeDashoffset =
+    220 - progress * 220;
 });
 
 adVideo.addEventListener("ended", endAd);
@@ -970,11 +980,16 @@ overlayTop.style.pointerEvents = "auto";
 // MAIN PLAYER
 // ===============================
 function togglePlay() {
+
+  // Hide seek preview when user confirms
+  seekPreview.style.display = "none";
+
   if (mainPlayer.paused) {
     mainPlayer.play();
   } else {
     mainPlayer.pause();
   }
+
   setTimeout(updatePlayIcon, 50);
 }
 
@@ -1028,7 +1043,7 @@ function goToNextEpisode() {
 
   // 🌐 Update URL (no reload feel)
   history.pushState({}, "", `/watch?show=${show}&s=${season}&e=${nextEpisode}`);
-
+loadContent();
 
 
   // ▶️ Restart player cleanly
@@ -1069,9 +1084,9 @@ function goFullScreen() {
   const wrapper = document.getElementById("video-wrapper");
 
   if (!document.fullscreenElement) {
-    wrapper.requestFullscreen();
+    wrapper.requestFullscreen?.();
   } else {
-    document.exitFullscreen();
+    document.exitFullscreen?.();
   }
 }
 
@@ -1106,8 +1121,11 @@ function showControls() {
   }, 3000);
 }
 
-document.addEventListener("mousemove", showControls);
-document.addEventListener("touchstart", showControls);
+if ("ontouchstart" in window) {
+  document.addEventListener("touchstart", showControls);
+} else {
+  document.addEventListener("mousemove", showControls);
+}
 
 // ===============================
 // PROGRESS BAR
@@ -1146,23 +1164,49 @@ function formatTime(sec) {
 // ===============================
 // SEEK (LEFT / RIGHT)
 // ===============================
+let seekTarget = 0;
+let seekTimeout;
+
 function openSeekPreview(direction) {
-  const wasPlaying = !mainPlayer.paused;
 
-  mainPlayer.pause(); // ✅ ALWAYS pause while seeking
+  // Pause video while previewing
+  mainPlayer.pause();
 
+  // Calculate target
   if (direction === "rewind") {
-    mainPlayer.currentTime = Math.max(0, mainPlayer.currentTime - 5);
+    seekTarget = Math.max(0, mainPlayer.currentTime - 5);
   } else {
-    mainPlayer.currentTime = Math.min(
+    seekTarget = Math.min(
       mainPlayer.duration,
       mainPlayer.currentTime + 5
     );
   }
 
-  // ❌ DO NOT auto resume
-  // user must press play manually (like Netflix)
+  // Move video visually
+  mainPlayer.currentTime = seekTarget;
+
+  // Update timestamp text
+  document.getElementById("preview-time").textContent =
+    formatTime(seekTarget);
+
+  // Show preview box
+  seekPreview.style.display = "block";
+
+  // Keep controls visible
+  showControls();
+
+  // Optional:
+  // if you want preview to NEVER disappear until play,
+  // REMOVE the timeout section below
+
+  clearTimeout(seekTimeout);
+
+  seekTimeout = setTimeout(() => {
+    if (mainPlayer.paused) return;
+    seekPreview.style.display = "none";
+  }, 2000);
 }
+  
 // ===============================
 // VOLUME
 // ===============================
@@ -1346,6 +1390,14 @@ function restartFromBeginning() {
   mainPlayer.currentTime = 0;
   document.getElementById("resume-popup").style.display = "none";
 }
+  
+  const { show, season, episode, movie } = getParams();
+
+let id = show
+  ? `${show}-S${season}E${episode}`
+  : movie;
+
+localStorage.removeItem("progress-" + id);
 
 // ===============================
 // NEXT EPISODE
@@ -1402,13 +1454,12 @@ if (textTrack) {
   
   // load content
   
-  function loadContent() {
+function loadContent() {
   const { show, season, episode, movie } = getParams();
 
-  // ❌ No params
   if (!show && !movie) {
     showError("No show or movie specified.");
-    return;
+    return false;
   }
 
   // 🎬 SHOW LOGIC
@@ -1417,19 +1468,19 @@ if (textTrack) {
 
     if (!showData) {
       showError("Show not found.");
-      return;
+      return false;
     }
 
     const seasonData = showData.seasons[season];
     if (!seasonData) {
       showError("Season not found.");
-      return;
+      return false;
     }
 
     const epData = seasonData[episode];
     if (!epData) {
       showError("Episode not found.");
-      return;
+      return false;
     }
 
     // ✅ SET VIDEO
@@ -1441,7 +1492,7 @@ if (textTrack) {
     document.getElementById("large-episode-title").textContent =
       `S${season}E${episode}: ${epData.title}`;
 
-    return;
+    return true;
   }
 
   // 🎥 MOVIE LOGIC
@@ -1450,7 +1501,7 @@ if (textTrack) {
 
     if (!movieData) {
       showError("Movie not found.");
-      return;
+      return false;
     }
 
     mainPlayer.src = movieData.src;
@@ -1460,7 +1511,7 @@ if (textTrack) {
     document.getElementById("large-episode-title").textContent =
       movieData.title;
 
-    return;
+    return true;
   }
 }
   
@@ -1478,4 +1529,4 @@ if (textTrack) {
   
 </body>
   
-    </html>
+                                                                                                   </html>
