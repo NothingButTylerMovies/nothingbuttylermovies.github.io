@@ -4,6 +4,321 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be back soon | Stream | NothingButTyler Movies</title>
+    <script src="https://kit.fontawesome.com/eeb01edac2.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
+      <link rel="stylesheet" href="styles.css">
+<style>
+    :root {
+        --ice-blue: #38bdf8;
+        --onyx-black: #05070a;
+        --nbt-glass: rgba(255, 255, 255, 0.05);
+        --text-main: #f9f9f9;
+    }
+
+    body { 
+        margin: 0; font-family: 'Inter', sans-serif; 
+        background: var(--onyx-black); color: var(--text-main); 
+        overflow-x: hidden;
+    }
+
+    .backdrop {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+        background: linear-gradient(to right, var(--onyx-black) 30%, transparent 80%),
+                    linear-gradient(to top, var(--onyx-black) 10%, transparent 40%),
+                    url('https://nothingbuttylermovies.github.io/images/JennaAndTubers/covers/JennaAndTubers_S1E1_cover.png') center/cover;
+        z-index: -1;
+    }
+
+    /* DESKTOP LAYOUT */
+.app-container {
+    display: flex; 
+    flex-direction: row;
+    min-height: calc(100vh - 100px);
+    width: 100%;
+    padding: 120px 40px 0; /* add horizontal padding */
+    box-sizing: border-box; /* ensure padding included in width */
+    max-width: 1400px; /* optional: limit max width */
+    margin: 0 auto; /* center container */
+}
+
+    .side-info { flex: 1; position: sticky; top: 100px; height: fit-content; }
+    .episode-area { flex: 1.5; }
+
+    /* TEXT & BUTTONS */
+    #display-tag { color: var(--ice-blue); font-weight: 800; letter-spacing: 2px; text-transform: uppercase; font-size: 0.8rem; }
+    #display-title { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 900; margin: 15px 0; line-height: 1; text-transform: uppercase; }
+    #display-desc { opacity: 0.8; line-height: 1.6; font-size: 1.05rem; margin-bottom: 30px; }
+
+    .btn-primary {
+        background: var(--ice-blue); color: var(--onyx-black);
+        border: none; padding: 18px 45px; border-radius: 8px;
+        font-weight: 900; text-transform: uppercase; cursor: pointer;
+        display: flex; align-items: center; gap: 12px; width: fit-content;
+        text-decoration: none;
+    }
+
+    /* EPISODE SECTION */
+    .episode-header {
+        display: flex; justify-content: space-between; align-items: center;
+        border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 30px; padding-bottom: 10px;
+    }
+
+    .season-select {
+        background: var(--nbt-glass); color: white;
+        border: 1px solid rgba(255,255,255,0.2); padding: 10px 15px;
+        border-radius: 6px; font-weight: 700; cursor: pointer;
+    }
+
+    .ep-card {
+        display: grid; grid-template-columns: 200px 1fr; gap: 20px;
+        background: var(--nbt-glass); border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 15px; border-radius: 12px; margin-bottom: 20px;
+    }
+
+    .ep-thumb { width: 100%; aspect-ratio: 16/9; background: #111; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--ice-blue); }
+
+    /* 📱 THE MOBILE OVERRIDE - THE IMPORTANT PART */
+    @media (max-width: 900px) {
+        .app-container { 
+            flex-direction: column !important; /* Force vertical stack */
+            padding: 100px 20px;
+        }
+
+        .side-info, .episode-area { 
+            flex: none !important; 
+            width: 100% !important; /* Force full width */
+            position: relative; top: 0;
+        }
+
+        .btn-primary { width: 100%; justify-content: center; }
+
+        .episode-header {
+            flex-direction: column; align-items: stretch; gap: 10px;
+        }
+
+        .season-select { width: 100% !important; display: block; }
+
+        .ep-card { 
+            grid-template-columns: 1fr; /* Stack thumb over text */
+            width: 100%; box-sizing: border-box;
+        }
+    }
+    
+    /* This ensures the banner sits behind the nav and looks cinematic */
+
+
+/* NAVIGATION */
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 9999;
+    background: rgba(5, 7, 10, 0.85);
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+    text-decoration: none;
+}
+
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 40px;
+    text-decoration: none;
+}
+
+.nav-brand {
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--ice-blue);
+}
+
+.nav-brand i {
+    color: var(--ice-blue);
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    text-decoration: none;
+    color: var(--ice-blue);
+}
+
+.nav-link {
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.6;
+    text-decoration: none;
+    color: var(--ice-blue);
+}
+
+.nav-link:hover {
+    opacity: 1;
+    color: var(--ice-blue);
+    text-decoration: none;
+}
+
+.btn-main-site {
+    border: 1px solid var(--ice-blue);
+    padding: 8px 18px;
+    border-radius: 4px;
+    color: var(--ice-blue);
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-decoration: none;
+}
+
+.btn-main-site:hover {
+    background: var(--ice-blue);
+    color: var(--onyx-black);
+    text-decoration: none;
+}
+
+
+.site-footer {
+    background: rgba(5, 7, 10, 0.95);
+    border-top: 1px solid rgba(56, 189, 248, 0.15);
+    padding: 30px 20px;
+    margin-top: 60px;
+}
+
+.footer-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+
+        flex-direction: column;
+    text-align: center;
+}
+
+.footer-content p {
+    margin: 0;
+    opacity: 0.6;
+    font-size: 0.8rem;
+}
+
+.footer-links {
+    display: flex;
+    gap: 20px;
+}
+
+.footer-links a {
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.footer-links a:hover {
+    opacity: 1;
+    color: var(--ice-blue);
+}
+
+
+.ep-card {
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+.ep-card:hover {
+    background-color: rgba(56, 189, 248, 0.15);
+    box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+}
+
+.go-home-btn {
+    display: inline-block;
+    margin-top: 20px;
+    border: 1px solid var(--ice-blue);
+    padding: 12px 28px;
+    border-radius: 6px;
+    color: var(--ice-blue);
+    font-size: 0.85rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.go-home-btn:hover {
+    background-color: var(--ice-blue);
+    color: var(--onyx-black);
+    text-decoration: none;
+}
+
+
+.side-info.centered {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 60vh; /* or adjust as needed */
+    text-align: center;
+}
+
+.side-info.centered #display-title,
+.side-info.centered #display-tag,
+.side-info.centered #display-desc,
+.side-info.centered .go-home-btn {
+    margin: 10px 0;
+}
+
+
+</style>
+
+
+</head>
+
+<body>
+  
+  <nav>
+    <div class="nav-container">
+        <a href="/" class="nav-brand">
+            <i class="fa-solid fa-clapperboard"></i> NOTHINGBUTTYLER MOVIES
+        </a>
+        <div class="nav-links">
+            <a href="/movies" class="nav-link">Movies</a>
+            <a href="/series" class="nav-link">Series</a>
+            <a href="/ytps" class="nav-link">YTP's</a>
+            <a href="https://nothingbuttyler.github.io/?redirectedFromNBTMovies=true&redirectName=NBTMovies&redirect_uri=https://nothingbuttylermovies.github.io/" class="btn-main-site">Back to the Peak</a>
+        </div>
+    </div>
+</nav>
+
+
+    <div class="backdrop"></div>
+
+    <div class="app-container">
+
+        <center><h1>Be back soon!</h1></center>
+        <center><p>We're having slight problems with this page right now, but were on it, and you'll be back to streaming this show/movie soon.</p></center>
+
+    </div>
+</body>
+</html>
+
+        <!--
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stream {Loading...} | NothingButTyler Movies</title>
     <script src="https://kit.fontawesome.com/eeb01edac2.js" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
