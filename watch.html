@@ -1035,6 +1035,12 @@ adVideo.addEventListener("timeupdate", () => {
 adVideo.addEventListener("ended", endAd);
 
 function endAd() {
+  
+  // Exit fullscreen from ad first
+if (document.fullscreenElement === adOverlay) {
+  document.exitFullscreen?.();
+}
+  
   adFinished = true;
 
   adOverlay.style.display = "none";
@@ -1044,8 +1050,6 @@ function endAd() {
 
   controls.style.pointerEvents = "auto";
   overlayTop.style.pointerEvents = "auto";
-  
-  
 
 controls.classList.add("active");
 overlayTop.classList.add("active");
@@ -1435,6 +1439,25 @@ function setupCaptionControls() {
   [size, color, opacity, bg, bgOpacity, font, edge].forEach(el => {
     el.addEventListener("input", apply);
   });
+  
+  // Apply directly to live captions
+if (textTrack && textTrack.cues) {
+
+  for (let cue of textTrack.cues) {
+
+    cue.line = "auto";
+
+    const style = `
+      color:${color.value};
+      background:${bgColor};
+      font-size:${size.value}px;
+      font-family:${font.value};
+    `;
+
+    cue.style = style;
+  }
+
+}
 
   apply();
 }
@@ -1492,6 +1515,10 @@ function resumePlayback() {
 }
 
 function restartFromBeginning() {
+  
+  localStorage.removeItem("progress-" + id);
+  
+  
   mainPlayer.currentTime = 0;
   document.getElementById("resume-popup").style.display = "none";
 }
@@ -1502,17 +1529,20 @@ let id = show
   ? `${show}-S${season}E${episode}`
   : movie;
 
-localStorage.removeItem("progress-" + id);
+
 
 // ===============================
 // NEXT EPISODE
 // ===============================
 mainPlayer.addEventListener("loadedmetadata", () => {
   textTrack = mainPlayer.textTracks[0];
+  
 
 if (textTrack) {
   textTrack.mode = "showing"; // 🔥 THIS LINE FIXES IT
 }
+  
+  setupCaptionControls();
 
   if (adFinished) checkResume();
 });
@@ -1755,8 +1785,92 @@ function getDeviceName() {
   return "Unknown Device";
 }
   
+  // Shortcut popup
+  
+  function openShortcutMenu() {
+
+  const menu = document.getElementById("shortcut-menu");
+  const table = document.getElementById("shortcut-table");
+  const deviceText = document.getElementById("device-name");
+
+  menu.style.display = "block";
+
+  const device = getDeviceName();
+
+  deviceText.textContent = "Your device: " + device;
+
+  // Clear old rows
+  table.innerHTML = "";
+
+  let shortcuts = [];
+
+  // COMPUTER / CHROMEBOOK
+  if (
+    device.includes("Windows") ||
+    device.includes("Mac") ||
+    device.includes("Chromebook") ||
+    device.includes("Linux")
+  ) {
+
+    shortcuts = [
+      ["Space / Enter", "Play & Pause"],
+      ["←", "Rewind 5 seconds"],
+      ["→", "Forward 5 seconds"],
+      ["F", "Fullscreen"],
+      ["M", "Mute"],
+      ["↑", "Show controls"]
+    ];
+
+  }
+
+  // TV
+  else if (device.includes("TV")) {
+
+    shortcuts = [
+      ["OK / Enter", "Play & Pause"],
+      ["←", "Rewind"],
+      ["→", "Forward"],
+      ["↑", "Show controls"],
+      ["Back", "Exit fullscreen"]
+    ];
+
+  }
+
+  // TABLET / PHONE
+  else {
+
+    shortcuts = [
+      ["Tap", "Show controls"],
+      ["Double Tap Left", "Rewind"],
+      ["Double Tap Right", "Forward"],
+      ["Fullscreen Button", "Enter fullscreen"]
+    ];
+
+  }
+
+  shortcuts.forEach(shortcut => {
+
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td style="padding:10px;">${shortcut[0]}</td>
+      <td style="padding:10px;">${shortcut[1]}</td>
+    `;
+
+    table.appendChild(row);
+
+  });
+
+}
+
+function closeShortcutMenu() {
+  document.getElementById("shortcut-menu").style.display = "none";
+}
+  
+  
+  
 </script>
   
 </body>
   
-  </html>
+      </html>
