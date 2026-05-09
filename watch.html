@@ -679,7 +679,7 @@ text-decoration: none;
           
         <div class="volume-container">  
   <i id="volume-icon" class="fa-solid fa-volume-high"></i>  
-  <input type="range" id="volume-slider" min="0" max="1" step="0.01">  
+  <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1">  
 </div>  
           
         <button onclick="toggleCaptions()"><i class="fa-solid fa-closed-captioning"></i></button>  
@@ -1292,7 +1292,9 @@ function openSeekPreview(direction) {
   }
 
   // Move video visually
-  mainPlayer.currentTime = seekTarget;
+  mainPlayer.fastSeek
+  ? mainPlayer.fastSeek(seekTarget)
+  : mainPlayer.currentTime = seekTarget;
 
   // Update timestamp text
   document.getElementById("preview-time").textContent =
@@ -1328,8 +1330,8 @@ function setupVolume() {
   updateVolumeIcon(saved);
 
   volumeSlider.addEventListener("input", () => {
-    mainPlayer.volume = volumeSlider.value;
-    updateVolumeIcon(volumeSlider.value);
+    mainPlayer.volume = parseFloat(volumeSlider.value);
+    updateVolumeIcon(parseFloat(volumeSlider.value));
     localStorage.setItem("volume", volumeSlider.value);
   });
 
@@ -1715,19 +1717,48 @@ function getDeviceName() {
 
   const ua = navigator.userAgent;
 
-  // =========================
-  // SMART TVs
-  // =========================
-  if (/TCL/i.test(ua)) return "TCL Smart TV";
-  if (/BRAVIA/i.test(ua)) return "Sony BRAVIA TV";
-  if (/Hisense/i.test(ua)) return "Hisense Smart TV";
-  if (/VIZIO/i.test(ua)) return "VIZIO Smart TV";
-  if (/Samsung/i.test(ua) && /TV/i.test(ua)) return "Samsung Smart TV";
-  if (/LG/i.test(ua) && /WebOS/i.test(ua)) return "LG Smart TV";
+  console.log(ua);
 
+  // =========================
+  // GOOGLE / TCL TV
+  // =========================
   if (/GoogleTV/i.test(ua)) return "Google TV";
-  if (/Android TV/i.test(ua)) return "Android TV";
-  if (/SmartTV|WebOS|Tizen/i.test(ua)) return "Smart TV";
+
+  if (/TCL/i.test(ua) && /TV/i.test(ua)) {
+    return "TCL Smart TV";
+  }
+
+  if (/Android TV/i.test(ua)) {
+    return "Android TV";
+  }
+
+  // =========================
+  // LG WEBOS
+  // =========================
+  if (/Web0S|WebOS|webOS/i.test(ua)) {
+    return "LG Smart TV";
+  }
+
+  // =========================
+  // SAMSUNG TV
+  // =========================
+  if (/Samsung/i.test(ua) && /TV/i.test(ua)) {
+    return "Samsung Smart TV";
+  }
+
+  // =========================
+  // SONY
+  // =========================
+  if (/BRAVIA/i.test(ua)) {
+    return "Sony BRAVIA TV";
+  }
+
+  // =========================
+  // OTHER TVs
+  // =========================
+  if (/SmartTV|Tizen/i.test(ua)) {
+    return "Smart TV";
+  }
 
   // =========================
   // APPLE
@@ -1737,23 +1768,22 @@ function getDeviceName() {
   if (/Macintosh|Mac OS X/i.test(ua)) return "Apple - Mac";
 
   // =========================
-  // WINDOWS
-  // =========================
-  if (/Windows NT 10/i.test(ua)) return "Windows 10/11 PC";
-  if (/Windows NT 6/i.test(ua)) return "Windows PC";
-
-  // =========================
   // CHROMEBOOK
   // =========================
   if (/CrOS/i.test(ua)) return "Chromebook";
 
   // =========================
-  // SAMSUNG DEVICES
+  // WINDOWS
+  // =========================
+  if (/Windows NT 10/i.test(ua)) return "Windows 10/11 PC";
+  if (/Windows NT/i.test(ua)) return "Windows PC";
+
+  // =========================
+  // SAMSUNG TABLETS
   // =========================
   if (/SM-T720/i.test(ua)) return "Samsung Galaxy Tab S5e";
   if (/SM-T870/i.test(ua)) return "Samsung Galaxy Tab S7";
   if (/SM-X700/i.test(ua)) return "Samsung Galaxy Tab S8";
-  if (/SM-S/i.test(ua)) return "Samsung Galaxy Phone";
 
   // =========================
   // PIXEL
@@ -1762,12 +1792,12 @@ function getDeviceName() {
   if (/Pixel/i.test(ua)) return "Google Pixel Phone";
 
   // =========================
-  // AMAZON
+  // FIRE TABLET
   // =========================
   if (/KF/i.test(ua)) return "Amazon Fire Tablet";
 
   // =========================
-  // GENERIC ANDROID
+  // ANDROID
   // =========================
   if (/Android/i.test(ua) && /Mobile/i.test(ua)) {
     return "Android Phone";
@@ -1867,10 +1897,46 @@ function closeShortcutMenu() {
   document.getElementById("shortcut-menu").style.display = "none";
 }
   
-  
+  // ===============================
+// TV REMOTE SUPPORT
+// ===============================
+document.addEventListener("keydown", (e) => {
+
+  console.log("KEY:", e.key, e.keyCode);
+
+  switch (e.key) {
+
+    // PLAY
+    case "MediaPlay":
+    case "Play":
+      mainPlayer.play();
+      break;
+
+    // PAUSE
+    case "MediaPause":
+    case "Pause":
+      mainPlayer.pause();
+      break;
+
+    // PLAY/PAUSE TOGGLE
+    case "MediaPlayPause":
+      togglePlay();
+      break;
+
+    // FAST FORWARD
+    case "MediaFastForward":
+      openSeekPreview("forward");
+      break;
+
+    // REWIND
+    case "MediaRewind":
+      openSeekPreview("rewind");
+      break;
+  }
+});
   
 </script>
   
 </body>
   
-      </html>
+          </html>
