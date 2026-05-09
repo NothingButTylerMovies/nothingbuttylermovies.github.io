@@ -567,6 +567,46 @@ text-decoration: none;
   transition: all 0.2s ease;
 }
   
+  /* for the awesome tv users */
+  @media (min-width: 1200px) and (pointer: coarse) {
+
+  .control-buttons button {
+    font-size: 2.8rem;
+  }
+
+  #time-display {
+    font-size: 1.5rem;
+  }
+
+  .video-controls {
+    bottom: 40px;
+    padding: 0 20px;
+  }
+
+  .progress-area {
+    height: 10px;
+  }
+
+  .back-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+  }
+
+  #large-episode-title {
+    font-size: 2rem;
+  }
+
+  #mini-show-title {
+    font-size: 1rem;
+  }
+
+  #settings-gear-btn {
+    font-size: 2.2rem;
+  }
+}
+  
+  
   </style>  
 </head>  
 <body oncontextmenu="return false;">  
@@ -694,6 +734,7 @@ text-decoration: none;
   <button onclick="setTheme('red')">Ice Red</button>  
   <button onclick="setTheme('green')">Ice Green</button>  
   <button onclick="openCaptionSettings()">Caption Settings</button>  
+  <button onclick="openShortcutMenu()">Key Shortcuts</button>
   <button onclick="restartVideo()">Restart Video</button>  
   <center><button id="settings-close-btn" onclick="closeSettings()"><i class="fa-solid fa-xmark"></i></button></center>  
 </div>  
@@ -750,6 +791,55 @@ text-decoration: none;
   </div>  
 </div>  
   
+  <div id="shortcut-menu" style="
+  display:none;
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:90%;
+  max-width:600px;
+  background:rgba(5,7,10,0.98);
+  border:2px solid var(--accent-main);
+  border-radius:20px;
+  padding:25px;
+  z-index:12000;
+">
+
+  <button onclick="closeShortcutMenu()" style="
+    position:absolute;
+    top:10px;
+    right:15px;
+    background:none;
+    border:none;
+    color:var(--accent-main);
+    font-size:2rem;
+    cursor:pointer;
+  ">
+    ✕
+  </button>
+
+  <h2 style="margin-top:0;">Key Shortcuts</h2>
+
+  <p id="device-name">Your device: Unknown</p>
+
+  <table style="
+    width:100%;
+    border-collapse:collapse;
+    margin-top:15px;
+  ">
+    <thead>
+      <tr>
+        <th style="text-align:left; padding:10px;">Key</th>
+        <th style="text-align:left; padding:10px;">Action</th>
+      </tr>
+    </thead>
+
+    <tbody id="shortcut-table">
+    </tbody>
+  </table>
+
+</div>
   
 <script>
   
@@ -967,14 +1057,29 @@ overlayTop.style.pointerEvents = "auto";
 
   mainPlayer.muted = true;
 
-  mainPlayer.play().then(() => {
+  const playPromise = mainPlayer.play();
+
+if (playPromise !== undefined) {
+  playPromise.then(() => {
+
     setTimeout(() => {
       mainPlayer.muted = false;
     }, 300);
 
     showControls();
+
+  }).catch(() => {
+
+    // TV browser blocked autoplay
+    controls.classList.add("active");
+    overlayTop.classList.add("active");
+
+    playIcon.className = "fa-solid fa-play";
+
   });
 }
+}
+    
 
 // ===============================
 // MAIN PLAYER
@@ -1523,10 +1628,135 @@ function loadContent() {
   document.title = text + " | NothingButTyler Movies";
 }
   
+// ===============================
+// KEY SHORTCUTS
+// ===============================
   
+  // shortcuts
+  
+  document.addEventListener("keydown", (e) => {
+
+  // Prevent accidental repeats
+  if (e.repeat) return;
+
+  switch (e.key) {
+
+    case "ArrowRight":
+      openSeekPreview("forward");
+      break;
+
+    case "ArrowLeft":
+      openSeekPreview("rewind");
+      break;
+
+    case " ":
+    case "Enter":
+      e.preventDefault();
+      togglePlay();
+      break;
+
+    case "ArrowUp":
+      showControls();
+      break;
+
+    case "f":
+    case "F":
+      goFullScreen();
+      break;
+
+    case "m":
+    case "M":
+      if (mainPlayer.volume > 0) {
+        mainPlayer.dataset.prev = mainPlayer.volume;
+        mainPlayer.volume = 0;
+      } else {
+        mainPlayer.volume = mainPlayer.dataset.prev || 1;
+      }
+
+      volumeSlider.value = mainPlayer.volume;
+      updateVolumeIcon(mainPlayer.volume);
+      break;
+  }
+});
+  
+  // Shortcut info (in settings)
+  
+function getDeviceName() {
+
+  const ua = navigator.userAgent;
+
+  // =========================
+  // SMART TVs
+  // =========================
+  if (/TCL/i.test(ua)) return "TCL Smart TV";
+  if (/BRAVIA/i.test(ua)) return "Sony BRAVIA TV";
+  if (/Hisense/i.test(ua)) return "Hisense Smart TV";
+  if (/VIZIO/i.test(ua)) return "VIZIO Smart TV";
+  if (/Samsung/i.test(ua) && /TV/i.test(ua)) return "Samsung Smart TV";
+  if (/LG/i.test(ua) && /WebOS/i.test(ua)) return "LG Smart TV";
+
+  if (/GoogleTV/i.test(ua)) return "Google TV";
+  if (/Android TV/i.test(ua)) return "Android TV";
+  if (/SmartTV|WebOS|Tizen/i.test(ua)) return "Smart TV";
+
+  // =========================
+  // APPLE
+  // =========================
+  if (/iPhone/i.test(ua)) return "Apple - iPhone";
+  if (/iPad/i.test(ua)) return "Apple - iPad";
+  if (/Macintosh|Mac OS X/i.test(ua)) return "Apple - Mac";
+
+  // =========================
+  // WINDOWS
+  // =========================
+  if (/Windows NT 10/i.test(ua)) return "Windows 10/11 PC";
+  if (/Windows NT 6/i.test(ua)) return "Windows PC";
+
+  // =========================
+  // CHROMEBOOK
+  // =========================
+  if (/CrOS/i.test(ua)) return "Chromebook";
+
+  // =========================
+  // SAMSUNG DEVICES
+  // =========================
+  if (/SM-T720/i.test(ua)) return "Samsung Galaxy Tab S5e";
+  if (/SM-T870/i.test(ua)) return "Samsung Galaxy Tab S7";
+  if (/SM-X700/i.test(ua)) return "Samsung Galaxy Tab S8";
+  if (/SM-S/i.test(ua)) return "Samsung Galaxy Phone";
+
+  // =========================
+  // PIXEL
+  // =========================
+  if (/Pixel Tablet/i.test(ua)) return "Google Pixel Tablet";
+  if (/Pixel/i.test(ua)) return "Google Pixel Phone";
+
+  // =========================
+  // AMAZON
+  // =========================
+  if (/KF/i.test(ua)) return "Amazon Fire Tablet";
+
+  // =========================
+  // GENERIC ANDROID
+  // =========================
+  if (/Android/i.test(ua) && /Mobile/i.test(ua)) {
+    return "Android Phone";
+  }
+
+  if (/Android/i.test(ua)) {
+    return "Android Tablet";
+  }
+
+  // =========================
+  // LINUX
+  // =========================
+  if (/Linux/i.test(ua)) return "Linux Computer";
+
+  return "Unknown Device";
+}
   
 </script>
   
 </body>
   
-                                                                                                   </html>
+  </html>
