@@ -104,6 +104,37 @@ nav {
     .movie-grid { grid-template-columns: 1fr; padding: 0 25px 80px; }
     .section-label { padding: 0 25px; }
 }
+
+    #profile-btn {
+    width: 45px;
+    height: 45px;
+
+    border-radius: 50%;
+    border: 1px solid var(--glass-border);
+
+    background: rgba(255,255,255,0.04);
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1.4rem;
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+#profile-btn:hover {
+    border-color: var(--ice-blue);
+    color: var(--ice-blue);
+
+    transform: scale(1.08);
+
+    box-shadow: var(--cinema-glow);
+}
+
+        
     </style>
 </head>
 <body>
@@ -127,6 +158,17 @@ nav {
                 <a href="#" class="nav-link">Series</a>
                 <a href="#" class="nav-link">YTP's</a>
                 <a href="https://nothingbuttyler.github.io/" class="btn-main-site">Back to the Peak</a>
+
+                    <!-- PROFILE BUTTON -->
+    <button id="profile-btn" onclick="openProfiles()">
+        <i class="fa-solid fa-user-plus"></i>
+    </button>
+                
+                <script>
+function openProfiles() {
+    alert("Profile system coming soon!");
+}
+                </script>
             </div>
         </div>
     </nav>
