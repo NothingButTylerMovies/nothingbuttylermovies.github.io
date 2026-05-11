@@ -354,9 +354,10 @@ overflow-y: auto;
 }
 
 #user-menu {
-    position: absolute;
-    top: 60px;
-    right: 0;
+    position: fixed;
+
+    top: 80px;
+    right: 30px;
 
     width: 220px;
 
@@ -376,7 +377,7 @@ overflow-y: auto;
 
     box-shadow: var(--cinema-glow);
 
-    z-index: 99999;
+    z-index: 999999;
 }
 
 #user-menu.active {
@@ -615,7 +616,16 @@ PROFILE / LOGIN SYSTEM
             </a>
         </div>
     </div>
+    
+        <div id="welcome-user" style="margin-top: 20px; font-weight: 700; color: var(--ice-blue);"></div>
+<p class="hero-desc">
+    This is the official cinematic archive for NothingButTyler...
+</p>
+
+<div id="welcome-user"></div>
+    
 </header>
+    
 
 <div class="section-label">Feature Films: Jenna's Evil Revenge</div>
 <main class="movie-grid">
@@ -681,7 +691,7 @@ PROFILE / LOGIN SYSTEM
     <a href="/series?show=JennaAndTubers" class="movie-card">
         <div class="thumb" style="border-bottom: 3px solid var(--ice-blue);">
             <img src="https://i.ytimg.com/vi/qoCu4H_bM0I/hqdefault.jpg?sqp=-oaymwEnCNACELwBSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLDsP-7bmUhVaAx_q3gn-8pD-7Lh0g" alt="Jenna & Tubers Series">
-            <div class="play-overlay"><i class="fa-solid fa-layer-group play-btn"></i></div>
+            <div class="play-overlay"><i class="fa-solid fa-play play-btn"></i></div>
         </div>
         <div class="movie-info">
             <h3>Jenna & Tubers</h3>
@@ -695,7 +705,7 @@ PROFILE / LOGIN SYSTEM
     <a href="/stream?ytp=InsideBoot2" class="movie-card">
         <div class="thumb" style="border: 2px solid #a855f7;">
             <img src="https://i.ytimg.com/vi/87w9MIttlqs/hqdefault.jpg?sqp=-oaymwFBCNACELwBSFryq4qpAzMIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB8AEB-AG8B4AC0AWKAgwIABABGFYgSChyMA8=&rs=AOn4CLDB8hTN5A0YMPtM1fp0SPein1asYg" alt="YTP">
-            <div class="play-overlay"><i class="fa-solid fa-bolt play-btn" style="color: #a855f7;"></i></div>
+            <div class="play-overlay"><i class="fa-solid fa-play play-btn" style="color: #a855f7;"></i></div>
         </div>
         <div class="movie-info">
             <h3>Inside Out 2 [YTP Parody]</h3>
@@ -808,48 +818,29 @@ window.handleGoogleLogin = async function () {
 CHECK USER
 ========================= */
 
-async function checkUser() {
+const name = user.user_metadata.full_name || user.user_metadata.name || "Creator";
 
-    const {
-        data: { session }
-    } = await supabaseClient.auth.getSession();
+const welcomeBox = document.getElementById("welcome-user");
 
-    console.log("SESSION:", session);
+if (welcomeBox) {
+    welcomeBox.innerHTML = `
+        <h2 style="margin: 10px 0;">
+            WELCOME ${name}!
+        </h2>
 
-    if (session) {
+        <p>
+            Welcome to NothingButTyler Movies! We're so glad to have you here!
+            Don't forget that you have cool perks on your account:
+        </p>
 
-        const user = session.user;
+        <ul>
+            <li>Watchlist saving</li>
+            <li>Watch progress tracking</li>
+            <li>Personalized experience</li>
+        </ul>
 
-        console.log("USER:", user);
-
-        const profileBtn =
-            document.getElementById("profile-btn");
-
-        const avatar =
-            user.user_metadata.avatar_url;
-
-        profileBtn.innerHTML = `
-            <img
-                src="${avatar}"
-                alt="Profile"
-                style="
-                    width:100%;
-                    height:100%;
-                    object-fit:cover;
-                    border-radius:50%;
-                "
-            >
-        `;
-
-        profileBtn.onclick = toggleUserMenu;
-
-        closeAuth();
-
-        localStorage.setItem(
-            "nbtm-user",
-            JSON.stringify(user)
-        );
-    }
+        <p>Enjoy!</p>
+    `;
 }
 
 /* =========================
@@ -885,8 +876,24 @@ window.addEventListener("load", () => {
     checkUser();
 
 });
+    
+    
+    
+    // click anywhere popup fix
+    document.addEventListener("click", function (e) {
+
+    const menu = document.getElementById("user-menu");
+    const profileBtn = document.getElementById("profile-btn");
+
+    const clickedInsideMenu = menu.contains(e.target);
+    const clickedProfile = profileBtn.contains(e.target);
+
+    if (!clickedInsideMenu && !clickedProfile) {
+        menu.classList.remove("active");
+    }
+});
 
 </script>
 
 </body>
-    </html>
+            </html>
