@@ -7,6 +7,7 @@
     
     <script src="https://kit.fontawesome.com/eeb01edac2.js" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://nexoraid.github.io/buttons/dark/dark_style.css" />
     
     <style>
     
@@ -104,7 +105,7 @@ nav {
     .movie-grid { grid-template-columns: 1fr; padding: 0 25px 80px; }
     .section-label { padding: 0 25px; }
 }
-
+    
     #profile-btn {
     width: 45px;
     height: 45px;
@@ -133,11 +134,329 @@ nav {
 
     box-shadow: var(--cinema-glow);
 }
+    
+    
+    /* =========================
+AUTH SYSTEM
+========================= */
 
-        
+#auth-overlay {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(12px);
+
+    display: none;
+    justify-content: center;
+    align-items: flex-start;
+padding-top: 60px;
+overflow-y: auto;
+
+    z-index: 20000;
+}
+
+#auth-overlay.active {
+    display: flex;
+}
+
+#auth-box {
+    width: 90%;
+    max-width: 460px;
+
+    background: rgba(5,7,10,0.96);
+
+    border: 1px solid var(--glass-border);
+
+    border-radius: 24px;
+
+    padding: 40px;
+
+    position: relative;
+
+    box-shadow: var(--cinema-glow);
+
+    overflow: hidden;
+}
+
+#auth-close {
+    position: absolute;
+    top: 15px;
+    right: 18px;
+
+    background: none;
+    border: none;
+
+    color: white;
+
+    font-size: 1.5rem;
+
+    cursor: pointer;
+}
+
+.auth-screen {
+    display: none;
+
+    animation: authFade 0.3s ease;
+}
+
+.auth-screen.active {
+    display: block;
+}
+
+@keyframes authFade {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.auth-screen h1,
+.auth-screen h2 {
+    margin-top: 0;
+
+    font-weight: 900;
+}
+
+.auth-screen p {
+    opacity: 0.7;
+    margin-bottom: 30px;
+}
+
+.auth-main-buttons {
+    display: flex;
+    gap: 15px;
+
+    margin-bottom: 20px;
+}
+
+.auth-main-buttons button,
+.auth-submit-btn,
+.social-auth button,
+.guest-btn {
+    width: 100%;
+
+    padding: 14px;
+
+    border-radius: 12px;
+
+    border: 1px solid var(--glass-border);
+
+    background: rgba(255,255,255,0.04);
+
+    color: white;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+.auth-main-buttons button:hover,
+.auth-submit-btn:hover,
+.social-auth button:hover,
+.guest-btn:hover {
+    border-color: var(--ice-blue);
+
+    color: var(--ice-blue);
+
+    box-shadow: var(--cinema-glow);
+
+    transform: scale(1.02);
+}
+
+.auth-screen input {
+    width: 100%;
+
+    padding: 14px;
+
+    margin-bottom: 15px;
+
+    border-radius: 12px;
+
+    border: 1px solid var(--glass-border);
+
+    background: rgba(255,255,255,0.04);
+
+    color: white;
+
+    font-size: 1rem;
+}
+
+.social-auth {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+
+    margin-top: 15px;
+}
+
+.back-auth-btn {
+    background: none;
+    border: none;
+
+    color: var(--ice-blue);
+
+    margin-bottom: 20px;
+
+    cursor: pointer;
+
+    font-weight: 700;
+}
+
+.forgot-password {
+    display: block;
+
+    margin-top: 18px;
+
+    text-align: center;
+
+    opacity: 0.7;
+}
+
+.forgot-password:hover {
+    color: var(--ice-blue);
+}
+
+@media (max-width: 768px) {
+
+    #auth-box {
+        padding: 30px 20px;
+    }
+
+    .auth-main-buttons {
+        flex-direction: column;
+    }
+}
+    
+    
     </style>
 </head>
 <body>
+    
+    <!-- =========================
+PROFILE / LOGIN SYSTEM
+========================= -->
+
+<div id="auth-overlay">
+
+  <div id="auth-box">
+
+    <!-- CLOSE -->
+    <button id="auth-close" onclick="closeAuth()">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <!-- HOME SCREEN -->
+    <div class="auth-screen active" id="auth-home">
+
+      <h1>Welcome to NothingButTyler Movies!</h1>
+
+      <p>
+        Watch movies, continue progress, save history,
+        and unlock premium features.
+      </p>
+
+      <div class="auth-main-buttons">
+        <button onclick="showLogin()">Login</button>
+        <button onclick="showSignup()">Sign Up</button>
+      </div>
+
+      <button class="guest-btn" onclick="continueGuest()">
+        Continue as Guest
+      </button>
+
+    </div>
+
+    <!-- LOGIN -->
+    <div class="auth-screen" id="auth-login">
+
+      <button class="back-auth-btn" onclick="goAuthHome()">
+        ← Back
+      </button>
+
+      <h2>Login</h2>
+
+      <input type="text" placeholder="Username">
+
+      <input type="password" placeholder="Password">
+
+      <button class="auth-submit-btn">
+        Login
+      </button>
+
+      <div class="social-auth">
+          
+      <button class="nexora-signin" onclick="window.location.href='https://nexoraid.github.io/authorize?id=G-MBSZ8QWCDE1568bESHQMNVEdu4ctteq'">
+  <img src="https://avatars.githubusercontent.com/u/263523948?s=70&v=4" alt="Nexora Logo">
+
+  <div class="signin-text">
+    <span class="top">Continue with</span>
+    <span class="bottom">Nexora</span>
+  </div>
+</button>
+          
+          <button onclick="handleGoogleLogin()">
+    Continue with Google
+</button>
+
+      </div>
+
+      <a href="#" class="forgot-password">
+        Forgot Password?
+      </a>
+
+    </div>
+
+    <!-- SIGNUP -->
+    <div class="auth-screen" id="auth-signup">
+
+      <button class="back-auth-btn" onclick="goAuthHome()">
+        ← Back
+      </button>
+
+      <h2>Create Account</h2>
+
+      <input type="text" placeholder="Username">
+
+      <input type="email" placeholder="Email">
+
+      <input type="password" placeholder="Password">
+
+      <input type="password" placeholder="Repeat Password">
+
+      <button class="auth-submit-btn">
+        Create Account
+      </button>
+
+      <div class="social-auth">
+
+                <button class="nexora-signin" onclick="window.location.href='https://nexoraid.github.io/authorize?id=G-MBSZ8QWCDE1568bESHQMNVEdu4ctteq'">
+  <img src="https://avatars.githubusercontent.com/u/263523948?s=70&v=4" alt="Nexora Logo">
+
+  <div class="signin-text">
+    <span class="top">Continue with</span>
+    <span class="bottom">Nexora</span>
+  </div>
+</button>
+          
+          
+        <button onclick="handleGoogleLogin()">
+    Continue with Google
+</button>
+      </div>
+
+    </div>
+
+  </div>
+</div>
 
     <nav>
         <div class="nav-container">
@@ -158,17 +477,15 @@ nav {
                 <a href="#" class="nav-link">Series</a>
                 <a href="#" class="nav-link">YTP's</a>
                 <a href="https://nothingbuttyler.github.io/" class="btn-main-site">Back to the Peak</a>
-
-                    <!-- PROFILE BUTTON -->
+                
+                
+    <!-- PROFILE BUTTON -->
     <button id="profile-btn" onclick="openProfiles()">
         <i class="fa-solid fa-user-plus"></i>
     </button>
                 
-                <script>
-function openProfiles() {
-    alert("Profile system coming soon!");
-}
-                </script>
+
+                
             </div>
         </div>
     </nav>
@@ -298,6 +615,121 @@ function openProfiles() {
     <footer style="padding: 60px 20px; text-align: center; border-top: 1px solid var(--glass-border); opacity: 0.5; font-size: 0.7rem; letter-spacing: 2px;">
         NOTHINGBUTTYLER MOVIES &copy; 2026 | THE RIDGELINE STUDIO
     </footer>
+    
+                    <script>
+function openProfiles() {
+    document
+      .getElementById("auth-overlay")
+      .classList.add("active");
+
+    goAuthHome();
+}
+
+function closeAuth() {
+    document
+      .getElementById("auth-overlay")
+      .classList.remove("active");
+}
+
+function hideAllAuthScreens() {
+
+    document
+      .querySelectorAll(".auth-screen")
+      .forEach(screen => {
+          screen.classList.remove("active");
+      });
+}
+
+function goAuthHome() {
+    hideAllAuthScreens();
+
+    document
+      .getElementById("auth-home")
+      .classList.add("active");
+}
+
+function showLogin() {
+    hideAllAuthScreens();
+
+    document
+      .getElementById("auth-login")
+      .classList.add("active");
+}
+
+function showSignup() {
+    hideAllAuthScreens();
+
+    document
+      .getElementById("auth-signup")
+      .classList.add("active");
+}
+
+function continueGuest() {
+
+    localStorage.setItem("nbtm-profile", "guest");
+
+    closeAuth();
+
+    alert("Continuing as Guest");
+}
+</script>
+    
+    
+    <!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script type="module">
+
+import { createClient }
+from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+const supabase = createClient(
+  "https://dqxtenfrlkqxpuuziyhj.supabase.co",
+  "YOUR_PUBLISHABLE_KEY"
+);
+
+window.handleGoogleLogin = async function () {
+
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: window.location.origin
+    }
+  });
+
+  if (error) {
+    console.error(error);
+    alert("Google login failed");
+  }
+};
+
+async function checkUser() {
+
+  const { data: { session } } =
+    await supabase.auth.getSession();
+
+  if (session) {
+
+    console.log("Logged in!", session.user);
+
+    localStorage.setItem(
+      "nbtm-user",
+      JSON.stringify(session.user)
+    );
+
+    document.querySelector("#profile-btn i")
+      .className = "fa-solid fa-user";
+
+    closeAuth();
+  }
+}
+
+checkUser();
+
+</script>
 
 </body>
-</html>
+                </html>
