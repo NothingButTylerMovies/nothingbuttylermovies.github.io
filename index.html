@@ -336,7 +336,81 @@ overflow-y: auto;
     }
 }
     
+    /* user */
     
+    #profile-area {
+    position: relative;
+}
+
+#profile-btn {
+    overflow: hidden;
+    padding: 0;
+}
+
+#profile-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#user-menu {
+    position: absolute;
+    top: 60px;
+    right: 0;
+
+    width: 220px;
+
+    background: rgba(5,7,10,0.98);
+
+    border: 1px solid var(--glass-border);
+
+    border-radius: 18px;
+
+    padding: 10px;
+
+    display: none;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    box-shadow: var(--cinema-glow);
+
+    z-index: 99999;
+}
+
+#user-menu.active {
+    display: flex;
+}
+
+#user-menu button {
+    width: 100%;
+
+    background: rgba(255,255,255,0.04);
+
+    border: 1px solid transparent;
+
+    color: white;
+
+    padding: 12px;
+
+    border-radius: 12px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+#user-menu button:hover {
+    border-color: var(--ice-blue);
+
+    color: var(--ice-blue);
+}
     </style>
 </head>
 <body>
@@ -449,9 +523,29 @@ PROFILE / LOGIN SYSTEM
           
           
         <button onclick="handleGoogleLogin()">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/3840px-Google_%22G%22_logo.svg.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail" height="20" width="20" />&nbsp;
     Continue with Google
 </button>
       </div>
+          </div>
+      
+          <!-- USER MENU -->
+    <div id="user-menu">
+
+        <button onclick="location.href='/watchlist'">
+            <i class="fa-solid fa-bookmark"></i>
+            Watchlist
+        </button>
+
+        <button onclick="location.href='/settings'">
+            <i class="fa-solid fa-gear"></i>
+            Settings
+        </button>
+
+        <button onclick="logoutUser()">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Logout
+        </button>
 
     </div>
 
@@ -708,28 +802,55 @@ window.handleGoogleLogin = async function () {
 
 async function checkUser() {
 
-  const { data: { session } } =
-    await supabase.auth.getSession();
+    const {
+        data: { session }
+    } = await supabase.auth.getSession();
 
-  if (session) {
+    if (session) {
 
-    console.log("Logged in!", session.user);
+        const user = session.user;
 
-    localStorage.setItem(
-      "nbtm-user",
-      JSON.stringify(session.user)
-    );
+        console.log("Logged in!", user);
 
-    document.querySelector("#profile-btn i")
-      .className = "fa-solid fa-user";
+        localStorage.setItem(
+            "nbtm-user",
+            JSON.stringify(user)
+        );
 
-    closeAuth();
-  }
+        const profileBtn =
+            document.getElementById("profile-btn");
+
+        const avatar =
+            user.user_metadata.avatar_url;
+
+        profileBtn.innerHTML = `
+            <img src="${avatar}" alt="Profile">
+        `;
+
+        profileBtn.onclick = toggleUserMenu;
+
+        closeAuth();
+    }
+}
+
+function toggleUserMenu() {
+
+    document
+        .getElementById("user-menu")
+        .classList.toggle("active");
+}
+
+async function logoutUser() {
+
+    await supabase.auth.signOut();
+
+    localStorage.removeItem("nbtm-user");
+
+    location.reload();
 }
 
 checkUser();
-
 </script>
 
 </body>
-                </html>
+    </html>
