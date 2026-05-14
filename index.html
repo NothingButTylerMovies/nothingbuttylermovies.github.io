@@ -20,7 +20,7 @@
 }
 
 /* RESET & BASE */
-* { box-sizing: border-box; cursor: auto; }
+* { box-sizing: border-box; }
 body { 
     margin: 0; font-family: 'Inter', sans-serif; background: var(--onyx); color: white; 
     line-height: 1.6; overflow-x: hidden; 
@@ -412,6 +412,269 @@ overflow-y: auto;
 
     color: var(--ice-blue);
 }
+    
+    
+    
+    /* =========================
+WATCHLIST OVERLAY BUTTON
+========================= */
+
+.watchlist-btn {
+    position: absolute;
+
+    top: 12px;
+    right: 12px;
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(255,255,255,0.15);
+
+    background: rgba(0,0,0,0.6);
+
+    backdrop-filter: blur(10px);
+
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1rem;
+
+    cursor: pointer;
+
+    transition: 0.25s ease;
+
+    z-index: 50;
+}
+
+.watchlist-btn:hover {
+    transform: scale(1.08);
+
+    border-color: var(--ice-blue);
+
+    color: var(--ice-blue);
+
+    box-shadow: var(--cinema-glow);
+}
+
+/* SAVED STATE */
+
+.watchlist-btn.saved {
+    border-color: var(--ice-blue);
+
+    color: var(--ice-blue);
+
+    background: rgba(56,189,248,0.12);
+
+    box-shadow: var(--cinema-glow);
+}
+
+/* TOOLTIP */
+
+.watchlist-btn::after {
+    content: "Add to Watchlist";
+
+    position: absolute;
+
+    top: 50%;
+    right: 55px;
+
+    transform: translateY(-50%);
+
+    background: rgba(5,7,10,0.95);
+
+    border: 1px solid var(--glass-border);
+
+    padding: 8px 12px;
+
+    border-radius: 10px;
+
+    font-size: 0.7rem;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition: 0.2s ease;
+}
+
+.watchlist-btn:hover::after {
+    opacity: 1;
+}
+
+.watchlist-btn.saved::after {
+    content: "Remove from Watchlist";
+}
+    
+    
+    /* =========================
+CUSTOM ALERT
+========================= */
+
+#custom-alert {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,0.65);
+
+    backdrop-filter: blur(10px);
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    z-index: 9999999;
+}
+
+#custom-alert.active {
+    display: flex;
+}
+
+#custom-alert-box {
+
+    width: 90%;
+    max-width: 420px;
+
+    background: rgba(5,7,10,0.96);
+
+    border: 1px solid var(--glass-border);
+
+    border-radius: 22px;
+
+    padding: 35px;
+
+    position: relative;
+
+    box-shadow: var(--cinema-glow);
+
+    text-align: center;
+
+    animation: alertPop 0.25s ease;
+}
+
+@keyframes alertPop {
+
+    from {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+#custom-alert-box h2 {
+
+    margin-top: 10px;
+
+    margin-bottom: 30px;
+
+    font-size: 1.3rem;
+
+    line-height: 1.4;
+}
+
+#custom-alert-btn {
+
+    width: 100%;
+
+    padding: 14px;
+
+    border-radius: 14px;
+
+    border: 1px solid var(--glass-border);
+
+    background: rgba(255,255,255,0.05);
+
+    color: white;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+#custom-alert-btn:hover {
+
+    border-color: var(--ice-blue);
+
+    color: var(--ice-blue);
+
+    box-shadow: var(--cinema-glow);
+}
+
+#custom-alert-close {
+
+    position: absolute;
+
+    top: 15px;
+    right: 15px;
+
+    background: none;
+    border: none;
+
+    color: white;
+
+    font-size: 1.3rem;
+
+    cursor: pointer;
+}
+    
+    .custom-alert-buttons {
+
+    display: flex;
+
+    gap: 12px;
+
+    margin-top: 25px;
+}
+
+.custom-alert-buttons button {
+
+    flex: 1;
+
+    padding: 14px;
+
+    border-radius: 14px;
+
+    border: 1px solid var(--glass-border);
+
+    background: rgba(255,255,255,0.05);
+
+    color: white;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+.custom-alert-buttons button:hover {
+
+    border-color: var(--ice-blue);
+
+    color: var(--ice-blue);
+
+    box-shadow: var(--cinema-glow);
+}
+
+.custom-alert-login {
+
+    background: rgba(56,189,248,0.08);
+}
     </style>
 </head>
 <body>
@@ -537,17 +800,6 @@ PROFILE / LOGIN SYSTEM
         <div class="nav-container">
             <a href="/" class="nav-brand"><i class="fa-solid fa-clapperboard"></i> NOTHINGBUTTYLER MOVIES</a>
             <div class="nav-links">
-                <a href="#" class="nav-link">Series</a>
-                <a href="#" class="nav-link">Behind The Scenes</a>
-                <a href="https://nothingbuttyler.github.io/" class="btn-main-site">Back to Hub</a>
-            </div>
-        </div>
-    </nav>
-
-    <nav>
-        <div class="nav-container">
-            <a href="/" class="nav-brand"><i class="fa-solid fa-clapperboard"></i> NOTHINGBUTTYLER MOVIES</a>
-            <div class="nav-links">
                 <a href="#" class="nav-link">Movies</a>
                 <a href="#" class="nav-link">Series</a>
                 <a href="#" class="nav-link">YTP's</a>
@@ -555,7 +807,7 @@ PROFILE / LOGIN SYSTEM
                 
                 
     <!-- PROFILE BUTTON -->
-    <button id="profile-btn" onclick="openProfiles()">
+    <button id="profile-btn" onclick="handleProfileClick()">
         <i class="fa-solid fa-user-plus"></i>
     </button>
                 
@@ -583,20 +835,6 @@ PROFILE / LOGIN SYSTEM
             </div>
         </div>
     </nav>
-
-    <!-- FEATURED / NEW MOVIE HEADER
-    
-    <header class="hero">
-        <div class="hero-content" style="padding-top: 120px;"> <span class="badge">Featured Premiere</span>
-            <h1 class="hero-title">GHOSTNET<br>ORIGINS</h1>
-            <p class="hero-desc">The digital void is calling. Witness the rise of the network in this high-octane Roblox cinematic experience.</p>
-            <div style="display: flex; gap: 15px; margin-top: 25px;">
-                <a href="#" class="btn-main-site" style="padding: 15px 40px; font-size: 0.8rem; background: var(--ice-blue); color: var(--onyx);">Watch Trailer</a>
-                </div>
-        </div>
-    </header>
-
-    -->
     
     <!-- ABOUT HEADER -->
     
@@ -619,7 +857,16 @@ PROFILE / LOGIN SYSTEM
     
 
 
-<div id="welcome-user"></div>
+<div id="welcome-user"
+style="
+margin-top:30px;
+padding:20px;
+background:rgba(0,0,0,0.45);
+border:1px solid var(--glass-border);
+border-radius:18px;
+max-width:550px;
+backdrop-filter:blur(10px);
+"></div>
     
 </header>
     
@@ -629,17 +876,43 @@ PROFILE / LOGIN SYSTEM
     <a href="/stream?movie=JennasEvilRevenge" class="movie-card">
         <div class="thumb">
             <img src="https://i.ytimg.com/vi/ZxvHENn615M/hqdefault.jpg?sqp=-oaymwFBCNACELwBSFryq4qpAzMIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB8AEB-AH-CYAC0AWKAgwIABABGDogUChyMA8=&rs=AOn4CLD9WmoGxQuVKGehL7UMV-SXuhPyZQ" alt="Jenna's Evil Revenge">
+            
+<!-- Jenna's Evil Revenge -->
+<button class="watchlist-btn"
+onclick='return toggleWatchlist(event, {
+    title: "Jenna\'s Evil Revenge",
+    image: "https://i.ytimg.com/vi/ZxvHENn615M/hqdefault.jpg",
+    url: "/stream?movie=JennasEvilRevenge",
+    type: "movie"
+});'>
+    <i class="fa-solid fa-bookmark"></i>
+</button>
+            
+            
             <div class="play-overlay"><i class="fa-solid fa-play play-btn"></i></div>
         </div>
         <div class="movie-info">
             <h3>Jenna's Evil Revenge</h3>
             <div class="meta"><span>Horror</span><span>Original</span><span>2024</span></div>
+           
         </div>
     </a>
 
     <a href="/stream?movie=JennasEvilRevenge2" class="movie-card">
         <div class="thumb">
             <img src="https://i.ytimg.com/vi/tLl54J_q_K4/hqdefault.jpg?sqp=-oaymwEnCNACELwBSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLDuDUemNk0hFnujXbDsfCdNxt20cg" alt="Jenna's Evil Revenge 2">
+            
+<!-- Jenna's Evil Revenge 2 -->
+<button class="watchlist-btn"
+onclick='return toggleWatchlist(event, {
+    title: "Jenna\'s Evil Revenge 2",
+    image: "https://i.ytimg.com/vi/tLl54J_q_K4/hqdefault.jpg",
+    url: "/stream?movie=JennasEvilRevenge2",
+    type: "movie"
+});'>
+    <i class="fa-solid fa-bookmark"></i>
+</button>
+            
             <div class="play-overlay"><i class="fa-solid fa-play play-btn"></i></div>
         </div>
         <div class="movie-info">
@@ -651,6 +924,19 @@ PROFILE / LOGIN SYSTEM
     <a href="/stream?movie=JennasEvilRevenge3Part1" class="movie-card">
         <div class="thumb">
             <img src="https://i.ytimg.com/vi/9kdZupSCR0o/hqdefault.jpg?sqp=-oaymwEnCNACELwBSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLAw54R2K1ZJWKD3urp3CoZM3NH7sQ" alt="JER 3 Part 1">
+            
+<!-- JER 3 Part 1 -->
+<button class="watchlist-btn"
+onclick='return toggleWatchlist(event, {
+    title: "Jenna\'s Evil Revenge 3 (Part 1)",
+    image: "https://i.ytimg.com/vi/9kdZupSCR0o/hqdefault.jpg",
+    url: "/stream?movie=JennasEvilRevenge3Part1",
+    type: "movie"
+});'>
+    <i class="fa-solid fa-bookmark"></i>
+</button>
+            
+            
             <div class="play-overlay"><i class="fa-solid fa-play play-btn"></i></div>
         </div>
         <div class="movie-info">
@@ -662,6 +948,18 @@ PROFILE / LOGIN SYSTEM
     <a href="/stream?movie=JennasEvilRevenge3Part2" class="movie-card">
         <div class="thumb">
             <img src="https://i.ytimg.com/vi/xQbm81A6n0U/hqdefault.jpg?sqp=-oaymwEnCNACELwBSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLB8wXcpUkRgMM9Rky9pYDUDAH77ew" alt="JER 3 Part 2">
+            
+<!-- JER 3 Part 2 -->
+<button class="watchlist-btn"
+onclick='return toggleWatchlist(event, {
+    title: "Jenna\'s Evil Revenge 3 (Part 2)",
+    image: "https://i.ytimg.com/vi/xQbm81A6n0U/hqdefault.jpg",
+    url: "/stream?movie=JennasEvilRevenge3Part2",
+    type: "movie"
+});'>
+    <i class="fa-solid fa-bookmark"></i>
+</button>
+            
             <div class="play-overlay"><i class="fa-solid fa-play play-btn"></i></div>
         </div>
         <div class="movie-info">
@@ -673,6 +971,18 @@ PROFILE / LOGIN SYSTEM
     <a href="/stream?movie=JennasEvilRevenge3Part3" class="movie-card">
         <div class="thumb" style="border: 1px solid var(--ice-blue);">
             <img src="https://i.ytimg.com/vi/AXekalnPoek/hqdefault.jpg?sqp=-oaymwEnCNACELwBSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLBSkr_CUNoPzOmPZCc8O0NKHsm4VA" alt="JER 3 Part 3">
+            
+<!-- JER 3 Part 3 -->
+<button class="watchlist-btn"
+onclick='return toggleWatchlist(event, {
+    title: "Jenna\'s Evil Revenge 3 (Part 3)",
+    image: "https://i.ytimg.com/vi/AXekalnPoek/hqdefault.jpg",
+    url: "/stream?movie=JennasEvilRevenge3Part3",
+    type: "movie"
+});'>
+    <i class="fa-solid fa-bookmark"></i>
+</button>
+            
             <div class="play-overlay"><i class="fa-solid fa-play play-btn"></i></div>
         </div>
         <div class="movie-info">
@@ -688,6 +998,19 @@ PROFILE / LOGIN SYSTEM
     <a href="/series?show=JennaAndTubers" class="movie-card">
         <div class="thumb" style="border-bottom: 3px solid var(--ice-blue);">
             <img src="https://i.ytimg.com/vi/qoCu4H_bM0I/hqdefault.jpg?sqp=-oaymwEnCNACELwBSFryq4qpAxkIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB&rs=AOn4CLDsP-7bmUhVaAx_q3gn-8pD-7Lh0g" alt="Jenna & Tubers Series">
+            
+<!-- Jenna & Tubers -->
+<button class="watchlist-btn"
+onclick='return toggleWatchlist(event, {
+    title: "Jenna & Tubers",
+    image: "https://i.ytimg.com/vi/qoCu4H_bM0I/hqdefault.jpg",
+    url: "/series?show=JennaAndTubers",
+    type: "series"
+});'>
+    <i class="fa-solid fa-bookmark"></i>
+</button>
+            
+            
             <div class="play-overlay"><i class="fa-solid fa-play play-btn"></i></div>
         </div>
         <div class="movie-info">
@@ -701,7 +1024,19 @@ PROFILE / LOGIN SYSTEM
 <main class="movie-grid">
     <a href="/stream?ytp=InsideBoot2" class="movie-card">
         <div class="thumb" style="border: 2px solid #a855f7;">
-            <img src="https://i.ytimg.com/vi/87w9MIttlqs/hqdefault.jpg?sqp=-oaymwFBCNACELwBSFryq4qpAzMIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB8AEB-AG8B4AC0AWKAgwIABABGFYgSChyMA8=&rs=AOn4CLDB8hTN5A0YMPtM1fp0SPein1asYg" alt="YTP">
+            <img src="https://i.ytimg.com/vi/87w9MIttlqs/hqdefault.jpg?sqp=-oaymwFBCNACELwBSFryq4qpAzMIARUAAIhCGAHYAQHiAQoIGBACGAY4AUAB8AEB-AG8B4AC0AWKAgwIABABGFYgSChyMA8=&rs=AOn4CLDB8hTN5A0YMPtM1fp0SPein1asYg" alt="INSIDE BOOT 2 - Inside Out 2 YTP">
+            
+<!-- Inside Out 2 YTP -->
+<button class="watchlist-btn"
+onclick='return toggleWatchlist(event, {
+    title: "Inside Out 2 [YTP Parody]",
+    image: "https://i.ytimg.com/vi/87w9MIttlqs/hqdefault.jpg",
+    url: "/stream?ytp=InsideBoot2",
+    type: "ytp"
+});'>
+    <i class="fa-solid fa-bookmark"></i>
+</button>
+            
             <div class="play-overlay"><i class="fa-solid fa-play play-btn" style="color: #a855f7;"></i></div>
         </div>
         <div class="movie-info">
@@ -715,6 +1050,50 @@ PROFILE / LOGIN SYSTEM
     <footer style="padding: 60px 20px; text-align: center; border-top: 1px solid var(--glass-border); opacity: 0.5; font-size: 0.7rem; letter-spacing: 2px;">
         NOTHINGBUTTYLER MOVIES &copy; 2026 | THE RIDGELINE STUDIO
     </footer>
+    
+<!-- =========================
+CUSTOM ALERT
+========================= -->
+
+<div id="custom-alert">
+
+    <div id="custom-alert-box">
+
+        <!-- CLOSE -->
+        <button id="custom-alert-close"
+                onclick="closeCustomAlert()">
+
+            <i class="fa-solid fa-xmark"></i>
+
+        </button>
+
+        <!-- TEXT -->
+        <h2 id="custom-alert-text">
+            Please login/signup to use the watchlist.
+        </h2>
+
+        <!-- BUTTONS -->
+        <div class="custom-alert-buttons">
+
+            <button class="custom-alert-cancel"
+                    onclick="closeCustomAlert()">
+
+                Cancel
+
+            </button>
+
+            <button class="custom-alert-login"
+                    onclick="openAuthFromAlert()">
+
+                Login / Sign Up
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
     
                     <script>
 function openProfiles() {
@@ -948,6 +1327,8 @@ window.addEventListener("load", () => {
 
     checkUser();
 
+    updateWatchlistButtons();
+
 });
     
     
@@ -967,7 +1348,7 @@ window.addEventListener("load", () => {
 });
     
     
-    ///////// 7 weeks timer detector
+    ///////// 1 week (7 days) timer detector
     
     function isPastWeek() {
     const firstLogin = localStorage.getItem("nbtm-first-login");
@@ -976,8 +1357,173 @@ window.addEventListener("load", () => {
     const week = 7 * 24 * 60 * 60 * 1000;
     return (Date.now() - Number(firstLogin)) > week;
 }
+    
+
+
+/* =========================
+WATCHLIST SYSTEM
+========================= */
+
+function toggleWatchlist(event, item) {
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    event.stopImmediatePropagation();
+
+    const savedUser =
+        localStorage.getItem("nbtm-user");
+
+    if (!savedUser) {
+
+        showCustomAlert(
+            "Please login/signup to use the watchlist."
+        );
+
+        return false;
+    }
+
+    let watchlist =
+        JSON.parse(
+            localStorage.getItem("nbtm-watchlist")
+        ) || [];
+
+    const exists =
+        watchlist.find(
+            movie => movie.title === item.title
+        );
+
+    if (exists) {
+
+        watchlist =
+            watchlist.filter(
+                movie => movie.title !== item.title
+            );
+
+    } else {
+
+        watchlist.push(item);
+    }
+
+    localStorage.setItem(
+        "nbtm-watchlist",
+        JSON.stringify(watchlist)
+    );
+
+    updateWatchlistButtons();
+
+    return false;
+}
+
+/* =========================
+UPDATE BUTTON STATES
+========================= */
+
+function updateWatchlistButtons() {
+
+    const watchlist =
+        JSON.parse(
+            localStorage.getItem("nbtm-watchlist")
+        ) || [];
+
+    document
+        .querySelectorAll(".watchlist-btn")
+        .forEach(button => {
+
+            const onclick =
+                button.getAttribute("onclick");
+
+            const match =
+                onclick.match(/title:\s*"([^"]+)"/);
+
+            if (!match) return;
+
+            const title = match[1];
+
+            const exists =
+                watchlist.find(
+                    movie => movie.title === title
+                );
+
+            if (exists) {
+
+                button.classList.add("saved");
+
+                button.innerHTML = `
+                    <i class="fa-solid fa-check"></i>
+                `;
+
+            } else {
+
+                button.classList.remove("saved");
+
+                button.innerHTML = `
+                    <i class="fa-solid fa-bookmark"></i>
+                `;
+            }
+        });
+}  
+    
+    /* =========================
+CUSTOM ALERT
+========================= */
+
+function showCustomAlert(message) {
+
+    const alertBox =
+        document.getElementById("custom-alert");
+
+    alertBox
+        .querySelector("h2")
+        .textContent = message;
+
+    alertBox.classList.add("active");
+}
+
+function closeCustomAlert() {
+
+    document
+        .getElementById("custom-alert")
+        .classList.remove("active");
+}
+    
+    function openAuthFromAlert() {
+
+    closeCustomAlert();
+
+    openProfiles();
+
+    goAuthHome();
+}
+    
+    // handleprofileclick
+    function handleProfileClick() {
+
+    const savedUser =
+        localStorage.getItem("nbtm-user");
+
+    if (savedUser) {
+        toggleUserMenu();
+    } else {
+        openProfiles();
+    }
+}
 
 </script>
+    
+        <!-- FEATURED / NEW MOVIE HEADER -->
+    
+    <!-- <header class="hero">
+        <div class="hero-content" style="padding-top: 120px;"> <span class="badge">Featured Premiere</span>
+            <h1 class="hero-title">GHOSTNET<br>ORIGINS</h1>
+            <p class="hero-desc">The digital void is calling. Witness the rise of the network in this high-octane Roblox cinematic experience.</p>
+            <div style="display: flex; gap: 15px; margin-top: 25px;">
+                <a href="#" class="btn-main-site" style="padding: 15px 40px; font-size: 0.8rem; background: var(--ice-blue); color: var(--onyx);">Watch Trailer</a>
+                </div>
+        </div>
+    </header>
+
+    -->
 
 </body>
-                                                                                  </html>
+                </html>
