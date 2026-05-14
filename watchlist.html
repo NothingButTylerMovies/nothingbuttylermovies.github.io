@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Watchlist | NothingButTyler Movies</title>
+
+<script src="https://kit.fontawesome.com/eeb01edac2.js" crossorigin="anonymous"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+
+    <style>
+    
+    :root {
+    --ice-blue: #38bdf8;
+    --onyx: #05070a;
+    --glass: rgba(56, 189, 248, 0.03);
+    --glass-border: rgba(56, 189, 248, 0.15);
+    --cinema-glow: 0 0 25px rgba(56, 189, 248, 0.3);
+}
+
+/* RESET & BASE */
+* { box-sizing: border-box; }
+body { 
+    margin: 0; font-family: 'Inter', sans-serif; background: var(--onyx); color: white; 
+    line-height: 1.6; overflow-x: hidden; 
+}
+a { text-decoration: none; color: inherit; transition: 0.3s; }
+
+/* NAVIGATION - THE TOP LAYER */
+nav {
+    position: fixed; top: 0; width: 100%; z-index: 9999; /* Forces it to the very front */
+    background: rgba(5, 7, 10, 0.85); 
+    backdrop-filter: blur(15px); border-bottom: 1px solid var(--glass-border);
+}
+.nav-container { 
+    max-width: 1400px; margin: 0 auto; display: flex; 
+    justify-content: space-between; align-items: center; padding: 18px 40px; 
+}
+.nav-brand { font-weight: 900; letter-spacing: 2px; text-transform: uppercase; font-size: 1.2rem; display: flex; align-items: center; gap: 12px; }
+.nav-brand i { color: var(--ice-blue); filter: drop-shadow(var(--cinema-glow)); }
+
+.nav-links { display: flex; gap: 30px; align-items: center; }
+.nav-link { font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; }
+.nav-link:hover { opacity: 1; color: var(--ice-blue); }
+
+.btn-main-site { 
+    border: 1px solid var(--ice-blue); padding: 8px 18px; border-radius: 4px; 
+    color: var(--ice-blue); font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
+}
+.btn-main-site:hover { background: var(--ice-blue); color: var(--onyx); box-shadow: var(--cinema-glow); }
+
+/* FEATURED HERO - THE OVERLAP FIX */
+.hero {
+    min-height: 85vh; width: 100%; position: relative;
+    display: flex; align-items: center; /* Centers content vertically */
+    padding-top: 100px; /* Pushes content below fixed nav */
+    background: linear-gradient(to top, var(--onyx) 15%, transparent 70%),
+                url('https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&q=80&w=2000') center/cover;
+}
+.hero-content { max-width: 1200px; margin: 0 auto; width: 100%; padding: 40px; position: relative; z-index: 10; }
+.badge { background: var(--ice-blue); color: var(--onyx); padding: 4px 12px; border-radius: 2px; font-weight: 900; font-size: 0.7rem; text-transform: uppercase; margin-bottom: 20px; display: inline-block; }
+.hero-title { font-size: clamp(3rem, 10vw, 6.5rem); font-weight: 900; margin: 0; line-height: 0.85; text-transform: uppercase; letter-spacing: -4px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); }
+.hero-desc { max-width: 550px; opacity: 0.8; margin: 25px 0; font-size: 1.1rem; text-shadow: 0 2px 10px rgba(0,0,0,0.5); text-align: center; }
+
+/* MOVIE GRID SYSTEM */
+.section-label { 
+    max-width: 1200px; margin: 60px auto 30px; padding: 0 40px;
+    font-weight: 800; text-transform: uppercase; letter-spacing: 4px; color: var(--ice-blue); font-size: 0.9rem;
+}
+.movie-grid { 
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); 
+    gap: 35px; max-width: 1200px; margin: 0 auto; padding: 0 40px 120px; 
+}
+.movie-card { 
+    background: var(--glass); border: 1px solid var(--glass-border); 
+    border-radius: 15px; overflow: hidden; position: relative; transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.movie-card:hover { transform: translateY(-12px) scale(1.02); border-color: var(--ice-blue); box-shadow: var(--cinema-glow); }
+
+.thumb { width: 100%; aspect-ratio: 16/9; background: #111; position: relative; overflow: hidden; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; transition: 0.6s; }
+.movie-card:hover .thumb img { scale: 1.1; opacity: 1; }
+
+.play-overlay { 
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+    display: flex; justify-content: center; align-items: center; 
+    background: rgba(5,7,10,0.3); opacity: 0; transition: 0.4s;
+}
+.movie-card:hover .play-overlay { opacity: 1; }
+.play-btn { font-size: 3.5rem; color: white; filter: drop-shadow(0 0 15px var(--ice-blue)); }
+
+.movie-info { padding: 25px; background: linear-gradient(to top, rgba(5,7,10,0.8), transparent); }
+.movie-info h3 { margin: 0; font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; }
+.meta { font-size: 0.75rem; opacity: 0.6; margin-top: 8px; display: flex; gap: 15px; font-weight: 700; text-transform: uppercase; color: var(--ice-blue); }
+
+/* PORTRAIT / MOBILE FIXES */
+@media (max-width: 768px) {
+    .nav-container { padding: 15px 25px; }
+    .nav-links { display: none; } /* Add burger menu logic here if needed */
+    .hero { min-height: 70vh; padding-top: 80px; }
+    .hero-content { padding: 30px; }
+    .hero-title { font-size: 3.5rem; letter-spacing: -2px; }
+    .hero-desc { font-size: 0.9rem; }
+    .movie-grid { grid-template-columns: 1fr; padding: 0 25px 80px; }
+    .section-label { padding: 0 25px; }
+}
+    
+    #profile-btn {
+    width: 45px;
+    height: 45px;
+
+    border-radius: 50%;
+    border: 1px solid var(--glass-border);
+
+    background: rgba(255,255,255,0.04);
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1.4rem;
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+#profile-btn:hover {
+    border-color: var(--ice-blue);
+    color: var(--ice-blue);
+
+    transform: scale(1.08);
+
+    box-shadow: var(--cinema-glow);
+}
+    
+    
+    /* =========================
+AUTH SYSTEM
+========================= */
+
+#auth-overlay {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(12px);
+
+    display: none;
+    justify-content: center;
+    align-items: flex-start;
+padding-top: 60px;
+overflow-y: auto;
+
+    z-index: 20000;
+}
+
+#auth-overlay.active {
+    display: flex;
+}
+
+#auth-box {
+    width: 90%;
+    max-width: 460px;
+
+    background: rgba(5,7,10,0.96);
+
+    border: 1px solid var(--glass-border);
+
+    border-radius: 24px;
+
+    padding: 40px;
+
+    position: relative;
+
+    box-shadow: var(--cinema-glow);
+
+    overflow: hidden;
+}
+
+#auth-close {
+    position: absolute;
+    top: 15px;
+    right: 18px;
+
+    background: none;
+    border: none;
+
+    color: white;
+
+    font-size: 1.5rem;
+
+    cursor: pointer;
+}
+
+.auth-screen {
+    display: none;
+
+    animation: authFade 0.3s ease;
+}
+
+.auth-screen.active {
+    display: block;
+}
+
+@keyframes authFade {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.auth-screen h1,
+.auth-screen h2 {
+    margin-top: 0;
+
+    font-weight: 900;
+}
+
+.auth-screen p {
+    opacity: 0.7;
+    margin-bottom: 30px;
+}
+
+.auth-main-buttons {
+    display: flex;
+    gap: 15px;
+
+    margin-bottom: 20px;
+}
+
+.auth-main-buttons button,
+.auth-submit-btn,
+.social-auth button,
+.guest-btn {
+    width: 100%;
+
+    padding: 14px;
+
+    border-radius: 12px;
+
+    border: 1px solid var(--glass-border);
+
+    background: rgba(255,255,255,0.04);
+
+    color: white;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+.auth-main-buttons button:hover,
+.auth-submit-btn:hover,
+.social-auth button:hover,
+.guest-btn:hover {
+    border-color: var(--ice-blue);
+
+    color: var(--ice-blue);
+
+    box-shadow: var(--cinema-glow);
+
+    transform: scale(1.02);
+}
+
+.auth-screen input {
+    width: 100%;
+
+    padding: 14px;
+
+    margin-bottom: 15px;
+
+    border-radius: 12px;
+
+    border: 1px solid var(--glass-border);
+
+    background: rgba(255,255,255,0.04);
+
+    color: white;
+
+    font-size: 1rem;
+}
+
+.social-auth {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+
+    margin-top: 15px;
+}
+
+.back-auth-btn {
+    background: none;
+    border: none;
+
+    color: var(--ice-blue);
+
+    margin-bottom: 20px;
+
+    cursor: pointer;
+
+    font-weight: 700;
+}
+
+.forgot-password {
+    display: block;
+
+    margin-top: 18px;
+
+    text-align: center;
+
+    opacity: 0.7;
+}
+
+.forgot-password:hover {
+    color: var(--ice-blue);
+}
+
+@media (max-width: 768px) {
+
+    #auth-box {
+        padding: 30px 20px;
+    }
+
+    .auth-main-buttons {
+        flex-direction: column;
+    }
+}
+    
+    /* user */
+    
+    #profile-area {
+    position: relative;
+}
+
+#profile-btn {
+    overflow: hidden;
+    padding: 0;
+}
+
+#profile-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#user-menu {
+    position: fixed;
+
+    top: 80px;
+    right: 30px;
+
+    width: 220px;
+
+    background: rgba(5,7,10,0.98);
+
+    border: 1px solid var(--glass-border);
+
+    border-radius: 18px;
+
+    padding: 10px;
+
+    display: none;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    box-shadow: var(--cinema-glow);
+
+    z-index: 999999;
+}
+
+#user-menu.active {
+    display: flex;
+}
+
+#user-menu button {
+    width: 100%;
+
+    background: rgba(255,255,255,0.04);
+
+    border: 1px solid transparent;
+
+    color: white;
+
+    padding: 12px;
+
+    border-radius: 12px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+#user-menu button:hover {
+    border-color: var(--ice-blue);
+
+    color: var(--ice-blue);
+}
+    
+    
+    
+    /* =========================
+WATCHLIST OVERLAY BUTTON
+========================= */
+
+.watchlist-btn {
+    position: absolute;
+
+    top: 12px;
+    right: 12px;
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(255,255,255,0.15);
+
+    background: rgba(0,0,0,0.6);
+
+    backdrop-filter: blur(10px);
+
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1rem;
+
+    cursor: pointer;
+
+    transition: 0.25s ease;
+
+    z-index: 50;
+}
+
+.watchlist-btn:hover {
+    transform: scale(1.08);
+
+    border-color: var(--ice-blue);
+
+    color: var(--ice-blue);
+
+    box-shadow: var(--cinema-glow);
+}
+
+/* SAVED STATE */
+
+.watchlist-btn.saved {
+    border-color: var(--ice-blue);
+
+    color: var(--ice-blue);
+
+    background: rgba(56,189,248,0.12);
+
+    box-shadow: var(--cinema-glow);
+}
+
+/* TOOLTIP */
+
+.watchlist-btn::after {
+    content: "Add to Watchlist";
+
+    position: absolute;
+
+    top: 50%;
+    right: 55px;
+
+    transform: translateY(-50%);
+
+    background: rgba(5,7,10,0.95);
+
+    border: 1px solid var(--glass-border);
+
+    padding: 8px 12px;
+
+    border-radius: 10px;
+
+    font-size: 0.7rem;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition: 0.2s ease;
+}
+
+.watchlist-btn:hover::after {
+    opacity: 1;
+}
+
+.watchlist-btn.saved::after {
+    content: "Remove from Watchlist";
+}
+    
+    
+    /* =========================
+CUSTOM ALERT
+========================= */
+
+#custom-alert {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,0.65);
+
+    backdrop-filter: blur(10px);
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    z-index: 9999999;
+}
+
+#custom-alert.active {
+    display: flex;
+}
+
+#custom-alert-box {
+
+    width: 90%;
+    max-width: 420px;
+
+    background: rgba(5,7,10,0.96);
+
+    border: 1px solid var(--glass-border);
+
+    border-radius: 22px;
+
+    padding: 35px;
+
+    position: relative;
+
+    box-shadow: var(--cinema-glow);
+
+    text-align: center;
+
+    animation: alertPop 0.25s ease;
+}
+
+@keyframes alertPop {
+
+    from {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+#custom-alert-box h2 {
+
+    margin-top: 10px;
+
+    margin-bottom: 30px;
+
+    font-size: 1.3rem;
+
+    line-height: 1.4;
+}
+
+#custom-alert-btn {
+
+    width: 100%;
+
+    padding: 14px;
+
+    border-radius: 14px;
+
+    border: 1px solid var(--glass-border);
+
+    background: rgba(255,255,255,0.05);
+
+    color: white;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+#custom-alert-btn:hover {
+
+    border-color: var(--ice-blue);
+
+    color: var(--ice-blue);
+
+    box-shadow: var(--cinema-glow);
+}
+
+#custom-alert-close {
+
+    position: absolute;
+
+    top: 15px;
+    right: 15px;
+
+    background: none;
+    border: none;
+
+    color: white;
+
+    font-size: 1.3rem;
+
+    cursor: pointer;
+}
+    
+    .custom-alert-buttons {
+
+    display: flex;
+
+    gap: 12px;
+
+    margin-top: 25px;
+}
+
+.custom-alert-buttons button {
+
+    flex: 1;
+
+    padding: 14px;
+
+    border-radius: 14px;
+
+    border: 1px solid var(--glass-border);
+
+    background: rgba(255,255,255,0.05);
+
+    color: white;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+.custom-alert-buttons button:hover {
+
+    border-color: var(--ice-blue);
+
+    color: var(--ice-blue);
+
+    box-shadow: var(--cinema-glow);
+}
+
+.custom-alert-login {
+
+    background: rgba(56,189,248,0.08);
+}
+    
+    
+    
+    
+    
+    
+    /* WATCHLIST PAGE */
+
+.hero {
+    flex-direction: column;
+    justify-content: center;
+
+    text-align: center;
+
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.hero h1 {
+    font-size: clamp(3rem, 9vw, 5rem);
+
+    margin-bottom: 15px;
+
+    font-weight: 900;
+
+    text-transform: uppercase;
+
+    letter-spacing: -3px;
+}
+
+.hero p {
+    max-width: 700px;
+
+    opacity: 0.75;
+
+    font-size: 1.05rem;
+}
+
+/* EMPTY WATCHLIST */
+
+.empty {
+    min-height: 50vh;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    padding: 60px 20px;
+
+    opacity: 0.7;
+}
+
+.empty i {
+    font-size: 4rem;
+
+    margin-bottom: 25px;
+
+    color: var(--ice-blue);
+}
+
+.empty h2 {
+    margin-bottom: 10px;
+
+    font-size: 2rem;
+}
+
+/* REMOVE BUTTON */
+
+.remove-btn {
+    position: absolute;
+
+    top: 12px;
+    right: 12px;
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(255,255,255,0.15);
+
+    background: rgba(0,0,0,0.65);
+
+    backdrop-filter: blur(10px);
+
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    z-index: 100;
+
+    transition: 0.25s ease;
+}
+
+.remove-btn:hover {
+    color: #ff4d4d;
+
+    border-color: #ff4d4d;
+
+    transform: scale(1.08);
+}
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-container">
+            <a href="/" class="nav-brand"><i class="fa-solid fa-clapperboard"></i> NOTHINGBUTTYLER MOVIES</a>
+            <div class="nav-links">
+                <a href="#" class="nav-link">Movies</a>
+                <a href="#" class="nav-link">Series</a>
+                <a href="#" class="nav-link">YTP's</a>
+                <a href="https://nothingbuttyler.github.io/" class="btn-main-site">Back to the Peak</a>
+                
+                
+    <!-- PROFILE BUTTON -->
+    <button id="profile-btn" onclick="handleProfileClick()">
+        <i class="fa-solid fa-user-plus"></i>
+    </button>
+                
+
+                         <!-- USER MENU -->
+    <div id="user-menu">
+
+        <button onclick="location.href='/watchlist'">
+            <i class="fa-solid fa-bookmark"></i>
+            Watchlist
+        </button>
+
+        <button onclick="location.href='/settings'">
+            <i class="fa-solid fa-gear"></i>
+            Settings
+        </button>
+
+        <button onclick="logoutUser()">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Logout
+        </button>
+
+    </div>
+                
+            </div>
+        </div>
+    </nav>
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <span class="badge">
+            PERSONAL LIBRARY
+        </span>
+
+        <h1 class="hero-title">
+            YOUR<br>WATCHLIST
+        </h1>
+
+        <p class="hero-desc">
+            Your saved movies, series, and YTP's are all here where you saved them.
+        </p>
+
+    </div>
+
+</section>
+
+<div id="watchlist-container"></div>
+    
+    <footer style="padding: 60px 20px; text-align: center; border-top: 1px solid var(--glass-border); opacity: 0.5; font-size: 0.7rem; letter-spacing: 2px;">
+        NOTHINGBUTTYLER MOVIES &copy; 2026 | THE RIDGELINE STUDIO
+    </footer>
+
+<script>
+  
+    const container =
+    document.getElementById("watchlist-container");
+    
+    /* =========================
+LOGIN CHECK
+========================= */
+
+const savedUser =
+    localStorage.getItem("nbtm-user");
+
+if (!savedUser) {
+
+    window.location.href = "/";
+
+}
+
+function loadWatchlist() {
+
+    const watchlist =
+        JSON.parse(
+            localStorage.getItem("nbtm-watchlist")
+        ) || [];
+
+    if (watchlist.length === 0) {
+
+        container.innerHTML = `
+            <div class="empty">
+
+                <i class="fa-solid fa-bookmark"></i>
+
+                <h2>Your watchlist is empty.</h2>
+
+                <p>
+                    Save movies and series to see them here.
+                </p>
+
+            </div>
+        `;
+
+        return;
+    }
+
+    container.innerHTML =
+        `<main class="movie-grid"></main>`;
+
+    const grid =
+        document.querySelector(".movie-grid");
+
+    watchlist.forEach(item => {
+
+        grid.innerHTML += `
+
+        <a href="${item.url}" class="movie-card">
+
+            <button class="remove-btn"
+            onclick="removeWatchlist(event, '${item.title}')">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+            <div class="thumb">
+
+                <img src="${item.image}" alt="${item.title}">
+
+            </div>
+
+            <div class="movie-info">
+
+                <h3>${decodeURIComponent(item.title)}</h3>
+
+                <div class="meta">
+                    ${item.type}
+                </div>
+
+            </div>
+
+        </a>
+        `;
+    });
+}
+
+function removeWatchlist(event, title) {
+
+    event.preventDefault();
+
+    let watchlist =
+        JSON.parse(
+            localStorage.getItem("nbtm-watchlist")
+        ) || [];
+
+    watchlist =
+        watchlist.filter(
+            item => item.title !== title
+        );
+
+    localStorage.setItem(
+        "nbtm-watchlist",
+        JSON.stringify(watchlist)
+    );
+
+    loadWatchlist();
+}
+
+loadWatchlist();
+
+</script>
+
+</body>
+  </html>
