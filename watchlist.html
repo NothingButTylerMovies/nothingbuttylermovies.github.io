@@ -964,6 +964,134 @@ function removeWatchlist(event, title) {
 loadWatchlist();
 
 </script>
+    
+    <!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+/* =========================
+CREATE CLIENT
+========================= */
+
+const supabaseClient = window.supabase.createClient(
+    "https://dqxtenfrlkqxpuuziyhj.supabase.co",
+    "sb_publishable_wbkLEBb4-NS6VWmQLznbtw_eTWEaSRa"
+);
+
+/* =========================
+CHECK USER
+========================= */
+
+async function checkUser() {
+
+    const {
+        data: { session }
+    } = await supabaseClient.auth.getSession();
+
+    if (!session) {
+
+        window.location.href = "/";
+
+        return;
+    }
+
+    const user = session.user;
+
+    const profileBtn =
+        document.getElementById("profile-btn");
+
+    const avatar =
+        user.user_metadata.avatar_url;
+
+    profileBtn.innerHTML = `
+        <img
+            src="${avatar}"
+            alt="Profile"
+            style="
+                width:100%;
+                height:100%;
+                object-fit:cover;
+                border-radius:50%;
+            "
+        >
+    `;
+
+    profileBtn.onclick = toggleUserMenu;
+
+    localStorage.setItem(
+        "nbtm-user",
+        JSON.stringify(user)
+    );
+}
+
+/* =========================
+MENU
+========================= */
+
+function toggleUserMenu() {
+
+    document
+        .getElementById("user-menu")
+        .classList.toggle("active");
+}
+
+/* =========================
+PROFILE CLICK
+========================= */
+
+function handleProfileClick() {
+
+    toggleUserMenu();
+}
+
+/* =========================
+LOGOUT
+========================= */
+
+async function logoutUser() {
+
+    await supabaseClient.auth.signOut();
+
+    localStorage.removeItem("nbtm-user");
+
+    window.location.href = "/";
+}
+
+/* =========================
+CLICK OUTSIDE FIX
+========================= */
+
+document.addEventListener("click", function (e) {
+
+    const menu =
+        document.getElementById("user-menu");
+
+    const profileBtn =
+        document.getElementById("profile-btn");
+
+    const clickedInsideMenu =
+        menu.contains(e.target);
+
+    const clickedProfile =
+        profileBtn.contains(e.target);
+
+    if (!clickedInsideMenu && !clickedProfile) {
+
+        menu.classList.remove("active");
+    }
+});
+
+/* =========================
+RUN
+========================= */
+
+window.addEventListener("load", () => {
+
+    checkUser();
+
+});
+</script>
 
 </body>
-  </html>
+</html>
