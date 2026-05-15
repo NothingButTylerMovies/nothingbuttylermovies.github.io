@@ -1,60 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
+
 <meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+content="width=device-width, initial-scale=1.0" />
 
 <title>Settings | NothingButTyler Movies</title>
 
-<script src="https://kit.fontawesome.com/eeb01edac2.js"
-crossorigin="anonymous"></script>
+<link
+href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap"
+rel="stylesheet"
+/>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap"
-rel="stylesheet">
+<script
+src="https://kit.fontawesome.com/eeb01edac2.js"
+crossorigin="anonymous">
+</script>
 
 <style>
 
+/* =========================
+ROOT
+========================= */
+
 :root {
+
     --ice-blue: #38bdf8;
+
     --onyx: #05070a;
-    --glass: rgba(56, 189, 248, 0.03);
-    --glass-border: rgba(56, 189, 248, 0.15);
-    --cinema-glow: 0 0 25px rgba(56, 189, 248, 0.3);
+
+    --glass: rgba(56,189,248,0.04);
+
+    --glass-border: rgba(56,189,248,0.15);
+
+    --cinema-glow:
+    0 0 25px rgba(56,189,248,0.3);
 }
 
-/* BASE */
+/* =========================
+BASE
+========================= */
 
 * {
     box-sizing: border-box;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
+
     margin: 0;
+
     font-family: 'Inter', sans-serif;
+
     background: var(--onyx);
+
     color: white;
+
     overflow-x: hidden;
 }
 
 a {
+
     text-decoration: none;
+
     color: inherit;
 }
 
-/* NAV */
+/* =========================
+NAVIGATION
+========================= */
 
 nav {
+
     position: fixed;
+
     top: 0;
+
     width: 100%;
+
     z-index: 9999;
 
-    background: rgba(5,7,10,0.85);
+    background:
+    rgba(5,7,10,0.86);
 
     backdrop-filter: blur(15px);
 
-    border-bottom: 1px solid var(--glass-border);
+    border-bottom:
+    1px solid var(--glass-border);
 }
 
 .nav-container {
@@ -74,73 +110,241 @@ nav {
 
 .nav-brand {
 
-    font-weight: 900;
-
-    letter-spacing: 2px;
-
-    text-transform: uppercase;
-
     display: flex;
 
     align-items: center;
 
     gap: 12px;
+
+    font-size: 1.1rem;
+
+    font-weight: 900;
+
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
 }
 
 .nav-brand i {
+
     color: var(--ice-blue);
+
+    filter:
+    drop-shadow(var(--cinema-glow));
 }
 
 .nav-links {
 
     display: flex;
 
-    gap: 20px;
-
     align-items: center;
+
+    gap: 24px;
+}
+
+.nav-link {
+
+    font-size: 0.75rem;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+
+    opacity: 0.65;
+
+    transition: 0.25s ease;
+}
+
+.nav-link:hover {
+
+    opacity: 1;
+
+    color: var(--ice-blue);
 }
 
 .btn-main-site {
 
-    border: 1px solid var(--ice-blue);
-
     padding: 8px 18px;
 
-    border-radius: 4px;
+    border-radius: 6px;
+
+    border:
+    1px solid var(--ice-blue);
 
     color: var(--ice-blue);
 
-    font-size: 0.7rem;
+    font-size: 0.72rem;
 
     font-weight: 800;
 
     text-transform: uppercase;
+
+    transition: 0.25s ease;
 }
 
 .btn-main-site:hover {
 
     background: var(--ice-blue);
 
-    color: black;
+    color: var(--onyx);
+
+    box-shadow:
+    var(--cinema-glow);
 }
 
-/* HERO */
+/* =========================
+PROFILE BUTTON
+========================= */
 
-.hero {
+#profile-btn {
 
-    min-height: 60vh;
+    width: 45px;
+    height: 45px;
+
+    border-radius: 50%;
+
+    overflow: hidden;
+
+    border:
+    1px solid var(--glass-border);
+
+    background:
+    rgba(255,255,255,0.04);
+
+    color: white;
 
     display: flex;
 
     align-items: center;
 
-    padding-top: 100px;
+    justify-content: center;
+
+    font-size: 1.2rem;
+
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+#profile-btn:hover {
+
+    transform: scale(1.08);
+
+    border-color: var(--ice-blue);
+
+    color: var(--ice-blue);
+
+    box-shadow:
+    var(--cinema-glow);
+}
+
+#profile-btn img {
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+/* =========================
+USER MENU
+========================= */
+
+#user-menu {
+
+    position: fixed;
+
+    top: 80px;
+    right: 30px;
+
+    width: 220px;
 
     background:
+    rgba(5,7,10,0.98);
+
+    border:
+    1px solid var(--glass-border);
+
+    border-radius: 18px;
+
+    padding: 10px;
+
+    display: none;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    backdrop-filter: blur(18px);
+
+    box-shadow:
+    var(--cinema-glow);
+
+    z-index: 999999;
+}
+
+#user-menu.active {
+    display: flex;
+}
+
+#user-menu button {
+
+    width: 100%;
+
+    padding: 12px;
+
+    border-radius: 12px;
+
+    border:
+    1px solid transparent;
+
+    background:
+    rgba(255,255,255,0.04);
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+#user-menu button:hover {
+
+    border-color: var(--ice-blue);
+
+    color: var(--ice-blue);
+}
+
+/* =========================
+HERO
+========================= */
+
+.hero {
+
+    min-height: 42vh;
+
+    padding-top: 120px;
+
+    display: flex;
+
+    align-items: center;
+
+    background:
+
     linear-gradient(
         to top,
-        var(--onyx) 15%,
-        rgba(5,7,10,0.7)
+        var(--onyx) 5%,
+        rgba(5,7,10,0.72)
     ),
 
     url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=2000')
@@ -148,6 +352,8 @@ nav {
 }
 
 .hero-content {
+
+    width: 100%;
 
     max-width: 1200px;
 
@@ -158,15 +364,17 @@ nav {
 
 .badge {
 
-    background: var(--ice-blue);
+    display: inline-block;
 
-    color: black;
-
-    padding: 4px 12px;
+    padding: 5px 12px;
 
     border-radius: 4px;
 
-    font-size: 0.7rem;
+    background: var(--ice-blue);
+
+    color: var(--onyx);
+
+    font-size: 0.72rem;
 
     font-weight: 900;
 
@@ -175,54 +383,81 @@ nav {
 
 .hero-title {
 
-    font-size: clamp(3rem, 10vw, 6rem);
+    margin:
+    18px 0 12px;
+
+    font-size:
+    clamp(3rem, 9vw, 5.5rem);
 
     font-weight: 900;
 
-    margin: 20px 0 10px;
-
-    line-height: 0.9;
+    line-height: 0.88;
 
     letter-spacing: -4px;
 }
 
 .hero-desc {
 
-    max-width: 650px;
+    max-width: 550px;
 
-    opacity: 0.8;
+    opacity: 0.78;
 
-    font-size: 1.1rem;
+    font-size: 1.05rem;
 }
 
-/* SETTINGS */
+/* =========================
+SETTINGS GRID
+========================= */
 
 .settings-grid {
 
     max-width: 1200px;
 
-    margin: 0 auto;
+    margin:
+    -60px auto 0;
 
-    padding: 40px;
+    padding: 0 40px 100px;
 
     display: grid;
 
     gap: 30px;
+
+    position: relative;
+
+    z-index: 5;
 }
+
+/* =========================
+SETTINGS CARD
+========================= */
 
 .settings-card {
 
-    background: var(--glass);
+    background:
+    rgba(10,12,16,0.82);
 
-    border: 1px solid var(--glass-border);
+    border:
+    1px solid var(--glass-border);
 
     border-radius: 24px;
 
     padding: 30px;
 
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(18px);
 
-    box-shadow: var(--cinema-glow);
+    transition:
+    0.3s ease;
+}
+
+.settings-card:hover {
+
+    transform: translateY(-4px);
+
+    border-color:
+    rgba(56,189,248,0.3);
+
+    box-shadow:
+    0 0 30px rgba(56,189,248,0.12);
 }
 
 .settings-card h2 {
@@ -236,7 +471,13 @@ nav {
     align-items: center;
 
     gap: 12px;
+
+    font-size: 1.2rem;
 }
+
+/* =========================
+PROFILE SECTION
+========================= */
 
 .profile-section {
 
@@ -247,32 +488,46 @@ nav {
     gap: 20px;
 
     margin-bottom: 25px;
+
+    padding-bottom: 20px;
+
+    border-bottom:
+    1px solid rgba(255,255,255,0.06);
 }
 
 .profile-section img {
 
-    width: 90px;
-
-    height: 90px;
+    width: 95px;
+    height: 95px;
 
     border-radius: 50%;
 
     object-fit: cover;
 
-    border: 2px solid var(--ice-blue);
+    border:
+    2px solid var(--ice-blue);
+
+    box-shadow:
+    0 0 25px rgba(56,189,248,0.2);
 }
 
 .profile-section h3 {
 
-    margin: 0;
+    margin: 0 0 5px;
+
+    font-size: 1.4rem;
 }
 
 .profile-section p {
 
+    margin: 0;
+
     opacity: 0.7;
 }
 
-/* BUTTON */
+/* =========================
+SETTINGS BUTTON
+========================= */
 
 .settings-btn {
 
@@ -280,9 +535,11 @@ nav {
 
     border-radius: 14px;
 
-    border: 1px solid var(--glass-border);
+    border:
+    1px solid var(--glass-border);
 
-    background: rgba(255,255,255,0.05);
+    background:
+    rgba(255,255,255,0.05);
 
     color: white;
 
@@ -295,16 +552,23 @@ nav {
 
 .settings-btn:hover {
 
+    transform: translateY(-2px);
+
     border-color: var(--ice-blue);
 
     color: var(--ice-blue);
 
-    box-shadow: var(--cinema-glow);
+    box-shadow:
+    var(--cinema-glow);
 }
 
-/* SETTING ROW */
+/* =========================
+SETTING ROW
+========================= */
 
 .setting-row {
+
+    min-height: 75px;
 
     display: flex;
 
@@ -312,24 +576,38 @@ nav {
 
     align-items: center;
 
-    padding: 18px 0;
+    border-bottom:
+    1px solid rgba(255,255,255,0.06);
 
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+    transition: 0.2s ease;
 }
 
-/* SWITCH */
+.setting-row:hover {
+
+    padding-left: 8px;
+
+    border-color:
+    rgba(56,189,248,0.2);
+}
+
+.setting-row span {
+
+    font-weight: 600;
+}
+
+/* =========================
+SWITCH
+========================= */
 
 .switch {
 
     position: relative;
 
     width: 55px;
-
     height: 30px;
 }
 
 .switch input {
-
     opacity: 0;
 }
 
@@ -339,13 +617,17 @@ nav {
 
     inset: 0;
 
-    background: rgba(255,255,255,0.15);
-
     border-radius: 999px;
+
+    background:
+    rgba(255,255,255,0.15);
+
+    cursor: pointer;
 
     transition: 0.25s ease;
 
-    cursor: pointer;
+    box-shadow:
+    inset 0 0 10px rgba(0,0,0,0.35);
 }
 
 .slider::before {
@@ -357,12 +639,12 @@ nav {
     width: 22px;
     height: 22px;
 
-    left: 4px;
     top: 4px;
-
-    background: white;
+    left: 4px;
 
     border-radius: 50%;
+
+    background: white;
 
     transition: 0.25s ease;
 }
@@ -370,6 +652,9 @@ nav {
 .switch input:checked + .slider {
 
     background: var(--ice-blue);
+
+    box-shadow:
+    0 0 18px rgba(56,189,248,0.45);
 }
 
 .switch input:checked + .slider::before {
@@ -377,110 +662,72 @@ nav {
     transform: translateX(25px);
 }
 
-/* PROFILE BUTTON */
+/* =========================
+FOOTER
+========================= */
 
-#profile-btn {
+footer {
 
-    width: 45px;
-    height: 45px;
+    padding: 60px 20px;
 
-    border-radius: 50%;
+    text-align: center;
 
-    overflow: hidden;
+    border-top:
+    1px solid var(--glass-border);
 
-    border: 1px solid var(--glass-border);
+    opacity: 0.5;
 
-    background: rgba(255,255,255,0.04);
+    font-size: 0.7rem;
 
-    cursor: pointer;
+    letter-spacing: 2px;
 }
 
-#profile-btn img {
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: cover;
-}
-
-/* USER MENU */
-
-#user-menu {
-
-    position: fixed;
-
-    top: 80px;
-    right: 30px;
-
-    width: 220px;
-
-    background: rgba(5,7,10,0.98);
-
-    border: 1px solid var(--glass-border);
-
-    border-radius: 18px;
-
-    padding: 10px;
-
-    display: none;
-
-    flex-direction: column;
-
-    gap: 8px;
-
-    box-shadow: var(--cinema-glow);
-
-    z-index: 999999;
-}
-
-#user-menu.active {
-    display: flex;
-}
-
-#user-menu button {
-
-    width: 100%;
-
-    background: rgba(255,255,255,0.04);
-
-    border: none;
-
-    color: white;
-
-    padding: 12px;
-
-    border-radius: 12px;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    cursor: pointer;
-}
-
-#user-menu button:hover {
-
-    border: 1px solid var(--ice-blue);
-
-    color: var(--ice-blue);
-}
-
-/* MOBILE */
+/* =========================
+MOBILE
+========================= */
 
 @media (max-width: 768px) {
 
     .nav-container {
+
         padding: 15px 25px;
     }
 
+    .nav-links .nav-link {
+
+        display: none;
+    }
+
+    .hero {
+
+        min-height: 36vh;
+
+        padding-top: 100px;
+    }
+
     .hero-content {
+
         padding: 30px;
     }
 
+    .hero-title {
+
+        font-size: 3rem;
+
+        letter-spacing: -2px;
+    }
+
     .settings-grid {
-        padding: 25px;
+
+        margin-top: -30px;
+
+        padding:
+        0 20px 80px;
+    }
+
+    .settings-card {
+
+        padding: 24px;
     }
 
     .profile-section {
@@ -495,268 +742,330 @@ nav {
 </head>
 <body>
 
+<!-- =========================
+NAV
+========================= -->
+
 <nav>
 
-    <div class="nav-container">
+<div class="nav-container">
 
-        <a href="/"
-        class="nav-brand">
+<a href="/"
+class="nav-brand">
 
-            <i class="fa-solid fa-clapperboard"></i>
+<i class="fa-solid fa-clapperboard"></i>
 
-            NOTHINGBUTTYLER MOVIES
+NOTHINGBUTTYLER MOVIES
 
-        </a>
+</a>
 
-        <div class="nav-links">
+<div class="nav-links">
 
-            <a href="/watchlist"
-            class="btn-main-site">
+<a href="#"
+class="nav-link">
+Movies
+</a>
 
-                Watchlist
+<a href="#"
+class="nav-link">
+Series
+</a>
 
-            </a>
+<a href="#"
+class="nav-link">
+YTP's
+</a>
 
-            <button id="profile-btn"
-            onclick="toggleUserMenu()">
+<a
+href="https://nothingbuttyler.github.io/"
+class="btn-main-site">
 
-                <i class="fa-solid fa-user"></i>
+Back to the Peak
 
-            </button>
+</a>
 
-        </div>
+<button
+id="profile-btn"
+onclick="toggleUserMenu()">
 
-    </div>
+<i class="fa-solid fa-user-plus"></i>
+
+</button>
+
+</div>
+
+</div>
 
 </nav>
 
+<!-- =========================
+USER MENU
+========================= -->
+
 <div id="user-menu">
 
-    <button onclick="location.href='/watchlist'">
+<button
+onclick="location.href='/watchlist'">
 
-        <i class="fa-solid fa-bookmark"></i>
+<i class="fa-solid fa-bookmark"></i>
 
-        Watchlist
+Watchlist
 
-    </button>
+</button>
 
-    <button onclick="location.href='/settings'">
+<button
+onclick="location.href='/settings'">
 
-        <i class="fa-solid fa-gear"></i>
+<i class="fa-solid fa-gear"></i>
 
-        Settings
+Settings
 
-    </button>
+</button>
 
-    <button onclick="logoutUser()">
+<button
+onclick="logoutUser()">
 
-        <i class="fa-solid fa-right-from-bracket"></i>
+<i class="fa-solid fa-right-from-bracket"></i>
 
-        Logout
+Logout
 
-    </button>
+</button>
 
 </div>
+
+<!-- =========================
+HERO
+========================= -->
 
 <section class="hero">
 
-    <div class="hero-content">
+<div class="hero-content">
 
-        <span class="badge">
-            ACCOUNT CENTER
-        </span>
+<span class="badge">
 
-        <h1 class="hero-title">
-            SETTINGS
-        </h1>
+ACCOUNT CENTER
 
-        <p class="hero-desc">
-            Customize your NothingButTyler Movies experience.
-        </p>
+</span>
 
-    </div>
+<h1 class="hero-title">
 
-</section>
+SETTINGS
 
-<div class="settings-grid">
+</h1>
 
-    <!-- PROFILE -->
+<p class="hero-desc">
 
-    <div class="settings-card">
+Customize your NothingButTyler Movies experience.
 
-        <h2>
-
-            <i class="fa-solid fa-user"></i>
-
-            Profile
-
-        </h2>
-
-        <div class="profile-section">
-
-            <img id="settings-avatar"
-            src=""
-            alt="Profile">
-
-            <div>
-
-                <h3 id="settings-name">
-                    Loading...
-                </h3>
-
-                <p id="settings-email">
-                    Loading...
-                </p>
-
-            </div>
-
-        </div>
-
-        <button class="settings-btn"
-        onclick="logoutUser()">
-
-            <i class="fa-solid fa-right-from-bracket"></i>
-
-            Logout
-
-        </button>
-
-    </div>
-
-    <!-- PLAYBACK -->
-
-    <div class="settings-card">
-
-        <h2>
-
-            <i class="fa-solid fa-play"></i>
-
-            Playback
-
-        </h2>
-
-        <div class="setting-row">
-
-            <span>Autoplay Next Episode</span>
-
-            <label class="switch">
-
-                <input type="checkbox"
-                id="autoplay-toggle">
-
-                <span class="slider"></span>
-
-            </label>
-
-        </div>
-
-        <div class="setting-row">
-
-            <span>Volume Memory</span>
-
-            <label class="switch">
-
-                <input type="checkbox"
-                id="volume-toggle">
-
-                <span class="slider"></span>
-
-            </label>
-
-        </div>
-
-        <div class="setting-row">
-
-            <span>Skip Intro Automatically</span>
-
-            <label class="switch">
-
-                <input type="checkbox"
-                id="intro-toggle">
-
-                <span class="slider"></span>
-
-            </label>
-
-        </div>
-
-    </div>
-
-    <!-- APPEARANCE -->
-
-    <div class="settings-card">
-
-        <h2>
-
-            <i class="fa-solid fa-palette"></i>
-
-            Appearance
-
-        </h2>
-
-        <div class="setting-row">
-
-            <span>Cinematic Mode</span>
-
-            <label class="switch">
-
-                <input type="checkbox"
-                id="cinematic-toggle">
-
-                <span class="slider"></span>
-
-            </label>
-
-        </div>
-
-        <div class="setting-row">
-
-            <span>Reduced Motion</span>
-
-            <label class="switch">
-
-                <input type="checkbox"
-                id="motion-toggle">
-
-                <span class="slider"></span>
-
-            </label>
-
-        </div>
-
-    </div>
+</p>
 
 </div>
 
-<footer style="
-padding:60px 20px;
-text-align:center;
-border-top:1px solid var(--glass-border);
-opacity:0.5;
-font-size:0.7rem;
-letter-spacing:2px;
-">
+</section>
 
-    NOTHINGBUTTYLER MOVIES © 2026
+<!-- =========================
+SETTINGS
+========================= -->
+
+<div class="settings-grid">
+
+<!-- PROFILE -->
+
+<div class="settings-card">
+
+<h2>
+
+<i class="fa-solid fa-user"></i>
+
+Profile
+
+</h2>
+
+<div class="profile-section">
+
+<img
+id="settings-avatar"
+src=""
+alt="Profile" />
+
+<div>
+
+<h3 id="settings-name">
+
+Loading...
+
+</h3>
+
+<p id="settings-email">
+
+Loading...
+
+</p>
+
+</div>
+
+</div>
+
+<button
+class="settings-btn"
+onclick="logoutUser()">
+
+<i class="fa-solid fa-right-from-bracket"></i>
+
+Logout
+
+</button>
+
+</div>
+
+<!-- PLAYBACK -->
+
+<div class="settings-card">
+
+<h2>
+
+<i class="fa-solid fa-play"></i>
+
+Playback
+
+</h2>
+
+<div class="setting-row">
+
+<span>
+Autoplay Next Episode
+</span>
+
+<label class="switch">
+
+<input
+type="checkbox"
+id="autoplay-toggle" />
+
+<span class="slider"></span>
+
+</label>
+
+</div>
+
+<div class="setting-row">
+
+<span>
+Volume Memory
+</span>
+
+<label class="switch">
+
+<input
+type="checkbox"
+id="volume-toggle" />
+
+<span class="slider"></span>
+
+</label>
+
+</div>
+
+<div class="setting-row">
+
+<span>
+Skip Intro Automatically
+</span>
+
+<label class="switch">
+
+<input
+type="checkbox"
+id="intro-toggle" />
+
+<span class="slider"></span>
+
+</label>
+
+</div>
+
+</div>
+
+<!-- APPEARANCE -->
+
+<div class="settings-card">
+
+<h2>
+
+<i class="fa-solid fa-palette"></i>
+
+Appearance
+
+</h2>
+
+<div class="setting-row">
+
+<span>
+Cinematic Mode
+</span>
+
+<label class="switch">
+
+<input
+type="checkbox"
+id="cinematic-toggle" />
+
+<span class="slider"></span>
+
+</label>
+
+</div>
+
+<div class="setting-row">
+
+<span>
+Reduced Motion
+</span>
+
+<label class="switch">
+
+<input
+type="checkbox"
+id="motion-toggle" />
+
+<span class="slider"></span>
+
+</label>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- =========================
+FOOTER
+========================= -->
+
+<footer>
+
+NOTHINGBUTTYLER MOVIES © 2026
 
 </footer>
 
-<!-- SUPABASE -->
+<!-- =========================
+SUPABASE
+========================= -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 
 /* =========================
-CREATE CLIENT
+SUPABASE
 ========================= */
 
 const supabaseClient =
 window.supabase.createClient(
 
-    "https://dqxtenfrlkqxpuuziyhj.supabase.co",
+"https://dqxtenfrlkqxpuuziyhj.supabase.co",
 
-    "sb_publishable_wbkLEBb4-NS6VWmQLznbtw_eTWEaSRa"
+"sb_publishable_wbkLEBb4-NS6VWmQLznbtw_eTWEaSRa"
 );
 
 /* =========================
@@ -765,63 +1074,67 @@ CHECK USER
 
 async function checkUser() {
 
-    const {
-        data: { session }
-    } =
-    await supabaseClient.auth.getSession();
+const {
 
-    if (!session) {
+data: { session }
 
-        window.location.href = "/";
+} =
+await supabaseClient.auth.getSession();
 
-        return;
-    }
+if (!session) {
 
-    const user = session.user;
+window.location.href = "/";
 
-    /* TOP PROFILE BUTTON */
+return;
+}
 
-    const profileBtn =
-    document.getElementById("profile-btn");
+const user = session.user;
 
-    profileBtn.innerHTML = `
+/* PROFILE BUTTON */
 
-        <img
-        src="${user.user_metadata.avatar_url}"
-        alt="Profile">
+const profileBtn =
+document.getElementById("profile-btn");
 
-    `;
+profileBtn.innerHTML = `
 
-    /* SETTINGS PROFILE */
+<img
+src="${user.user_metadata.avatar_url}"
+alt="Profile">
 
-    document.getElementById(
-        "settings-avatar"
-    ).src =
-    user.user_metadata.avatar_url;
+`;
 
-    document.getElementById(
-        "settings-name"
-    ).textContent =
+/* SETTINGS */
 
-    user.user_metadata.full_name ||
-    user.user_metadata.name ||
-    "Creator";
+document.getElementById(
+"settings-avatar"
+).src =
+user.user_metadata.avatar_url;
 
-    document.getElementById(
-        "settings-email"
-    ).textContent =
-    user.email;
+document.getElementById(
+"settings-name"
+).textContent =
+
+user.user_metadata.full_name ||
+
+user.user_metadata.name ||
+
+"Creator";
+
+document.getElementById(
+"settings-email"
+).textContent =
+user.email;
 }
 
 /* =========================
-MENU
+USER MENU
 ========================= */
 
 function toggleUserMenu() {
 
-    document
-    .getElementById("user-menu")
-    .classList.toggle("active");
+document
+.getElementById("user-menu")
+.classList.toggle("active");
 }
 
 /* =========================
@@ -830,11 +1143,9 @@ LOGOUT
 
 async function logoutUser() {
 
-    await supabaseClient.auth.signOut();
+await supabaseClient.auth.signOut();
 
-    localStorage.removeItem("nbtm-user");
-
-    window.location.href = "/";
+window.location.href = "/";
 }
 
 /* =========================
@@ -843,33 +1154,34 @@ CLICK OUTSIDE
 
 document.addEventListener(
 "click",
+
 function (e) {
 
-    const menu =
-    document.getElementById(
-        "user-menu"
-    );
+const menu =
+document.getElementById(
+"user-menu"
+);
 
-    const profileBtn =
-    document.getElementById(
-        "profile-btn"
-    );
+const profileBtn =
+document.getElementById(
+"profile-btn"
+);
 
-    const clickedInsideMenu =
-    menu.contains(e.target);
+const clickedInsideMenu =
+menu.contains(e.target);
 
-    const clickedProfile =
-    profileBtn.contains(e.target);
+const clickedProfile =
+profileBtn.contains(e.target);
 
-    if (
-        !clickedInsideMenu &&
-        !clickedProfile
-    ) {
+if (
+!clickedInsideMenu &&
+!clickedProfile
+) {
 
-        menu.classList.remove(
-            "active"
-        );
-    }
+menu.classList.remove(
+"active"
+);
+}
 });
 
 /* =========================
@@ -878,44 +1190,48 @@ SETTINGS SAVE
 
 const settingIds = [
 
-    "autoplay-toggle",
-    "volume-toggle",
-    "intro-toggle",
-    "cinematic-toggle",
-    "motion-toggle"
+"autoplay-toggle",
+
+"volume-toggle",
+
+"intro-toggle",
+
+"cinematic-toggle",
+
+"motion-toggle"
 ];
 
 settingIds.forEach(id => {
 
-    const toggle =
-    document.getElementById(id);
+const toggle =
+document.getElementById(id);
 
-    /* LOAD */
+/* LOAD */
 
-    const saved =
-    localStorage.getItem(id);
+const saved =
+localStorage.getItem(id);
 
-    if (saved === "true") {
+if (saved === "true") {
 
-        toggle.checked = true;
-    }
+toggle.checked = true;
+}
 
-    /* SAVE */
+/* SAVE */
 
-    toggle.addEventListener(
-    "change",
+toggle.addEventListener(
+"change",
 
-    () => {
+() => {
 
-        localStorage.setItem(
-            id,
-            toggle.checked
-        );
-    });
+localStorage.setItem(
+id,
+toggle.checked
+);
+});
 });
 
 /* =========================
-RUN
+START
 ========================= */
 
 window.addEventListener(
@@ -923,11 +1239,11 @@ window.addEventListener(
 
 () => {
 
-    checkUser();
+checkUser();
 
 });
 
 </script>
 
 </body>
-          </html>
+    </html>
