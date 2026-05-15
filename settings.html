@@ -198,54 +198,67 @@ nav {
 PROFILE BUTTON
 ========================= */
 
-#profile-btn {
+/* =========================
+PROFILE IMAGES FIX
+========================= */
 
-    width: 45px;
-    height: 45px;
+#profile-btn {
+    width: 52px;
+    height: 52px;
 
     border-radius: 50%;
 
     overflow: hidden;
 
-    border:
-    1px solid var(--glass-border);
+    border: 2px solid rgba(56,189,248,0.25);
 
-    background:
-    rgba(255,255,255,0.04);
-
-    color: white;
+    background: rgba(255,255,255,0.04);
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
-    font-size: 1.2rem;
-
-    cursor: pointer;
+    padding: 0;
 
     transition: 0.25s ease;
 }
 
 #profile-btn:hover {
-
-    transform: scale(1.08);
-
     border-color: var(--ice-blue);
 
-    color: var(--ice-blue);
+    box-shadow: 0 0 20px rgba(56,189,248,0.35);
 
-    box-shadow:
-    var(--cinema-glow);
+    transform: scale(1.05);
 }
 
 #profile-btn img {
-
     width: 100%;
     height: 100%;
 
     object-fit: cover;
+    object-position: center;
+
+    display: block;
+}
+
+/* SETTINGS PAGE PROFILE */
+
+.profile-section img {
+
+    width: 110px;
+    height: 110px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+    object-position: center;
+
+    display: block;
+
+    border: 3px solid rgba(56,189,248,0.4);
+
+    box-shadow:
+    0 0 25px rgba(56,189,248,0.22);
 }
 
 /* =========================
@@ -1246,4 +1259,4 @@ checkUser();
 </script>
 
 </body>
-    </html>
+</html>
