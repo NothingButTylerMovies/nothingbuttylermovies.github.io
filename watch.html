@@ -1264,11 +1264,15 @@ timeDisplay.textContent =
   id,
   title: document.getElementById("large-episode-title").textContent,
   show: document.getElementById("mini-show-title").textContent,
+
   progress: mainPlayer.currentTime,
   duration: mainPlayer.duration,
-  thumbnail: "YOUR_THUMBNAIL_URL"
-};
 
+  thumbnail: "YOUR_THUMBNAIL_URL",
+
+  url: window.location.pathname + window.location.search
+};
+  
 localStorage.setItem(
   "continue-" + id,
   JSON.stringify(continueWatching)
