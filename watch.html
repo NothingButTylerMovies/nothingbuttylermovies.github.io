@@ -1260,7 +1260,20 @@ timeDisplay.textContent =
     id = movie;
   }
 
-  localStorage.setItem("progress-" + id, mainPlayer.currentTime);
+  const continueWatching = {
+  id,
+  title: document.getElementById("large-episode-title").textContent,
+  show: document.getElementById("mini-show-title").textContent,
+  progress: mainPlayer.currentTime,
+  duration: mainPlayer.duration,
+  thumbnail: "YOUR_THUMBNAIL_URL"
+};
+
+localStorage.setItem(
+  "continue-" + id,
+  JSON.stringify(continueWatching)
+);
+  
 });
 
 function formatTime(sec) {
@@ -1939,4 +1952,4 @@ document.addEventListener("keydown", (e) => {
   
 </body>
   
-          </html>
+  </html>
