@@ -1954,6 +1954,23 @@ document.addEventListener("keydown", (e) => {
       break;
   }
 });
+
+
+  // localStorage.setItem
+
+  localStorage.setItem(
+  "continue-" + videoId,
+  JSON.stringify({
+    title: title,
+    show: show,
+    url: window.location.href,
+
+    thumbnail: "https://i.ytimg.com/vi/qoCu4H_bM0I/hqdefault.jpg",
+
+    progress: video.currentTime,
+    duration: video.duration
+  })
+);
   
 </script>
   
