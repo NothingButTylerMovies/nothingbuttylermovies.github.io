@@ -1536,36 +1536,6 @@ function closeCustomAlert() {
         openProfiles();
     }
 }
-    
-    
-    
-    // continue watching
-    const continueGrid =
-document.getElementById(
-    "continue-grid"
-);
-
-Object.keys(localStorage).forEach(key => {
-
-    if (!key.startsWith("continue-"))
-        return;
-
-    const item =
-    JSON.parse(localStorage.getItem(key));
-
-    continueGrid.innerHTML += `
-
-        <a href="${item.url}"
-        class="movie-card">
-
-            <img src="${item.thumbnail}">
-
-            <h3>${item.title}</h3>
-
-        </a>
-    `;
-});
-  
   
   // load continue watching for logged in accounts
   
@@ -1636,4 +1606,4 @@ loadContinueWatching();
     -->
 
 </body>
-                </html>
+    </html>
