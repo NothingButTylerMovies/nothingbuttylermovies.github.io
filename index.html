@@ -691,11 +691,40 @@ CUSTOM ALERT
 
 .continue-fill {
   height: 100%;
-  background: var(--accent-main);
+  background: var(--ice-blue);
   border-radius: 999px;
+  transition: width 0.3s ease;
 }
   
   
+    #continue-watching-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 35px;
+
+    max-width: 1200px;
+    margin: 0 auto;
+
+    padding: 0 40px 120px;
+}
+    
+    .movie-thumb {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+
+    display: block;
+
+    opacity: 0.8;
+
+    transition: 0.4s ease;
+}
+
+.movie-card:hover .movie-thumb {
+    opacity: 1;
+    transform: scale(1.03);
+}
+    
     </style>
 </head>
 <body>
