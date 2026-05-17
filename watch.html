@@ -1271,7 +1271,7 @@ timeDisplay.textContent =
   progress: mainPlayer.currentTime,
   duration: mainPlayer.duration,
 
-  thumbnail: "YOUR_THUMBNAIL_URL",
+  thumbnail: "https://i.ytimg.com/vi/qoCu4H_bM0I/hqdefault.jpg",
 
   url: window.location.pathname + window.location.search
 };
@@ -1956,21 +1956,7 @@ document.addEventListener("keydown", (e) => {
 });
 
 
-  // localStorage.setItem
 
-  localStorage.setItem(
-  "continue-" + videoId,
-  JSON.stringify({
-    title: title,
-    show: show,
-    url: window.location.href,
-
-    thumbnail: "https://i.ytimg.com/vi/qoCu4H_bM0I/hqdefault.jpg",
-
-    progress: video.currentTime,
-    duration: video.duration
-  })
-);
   
 </script>
   
